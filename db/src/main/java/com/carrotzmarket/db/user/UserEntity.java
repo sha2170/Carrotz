@@ -1,6 +1,5 @@
 package com.carrotzmarket.db.user;
 
-import com.carrotzmarket.db.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,11 +14,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "user")
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class UserEntity extends BaseEntity {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
