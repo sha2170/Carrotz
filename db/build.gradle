@@ -41,3 +41,12 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// 추가
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
