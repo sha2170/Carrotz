@@ -2,8 +2,8 @@ package com.carrotzmarket.api.domain.user.service;
 
 import com.carrotzmarket.api.common.error.UserErrorCode;
 import com.carrotzmarket.api.common.exception.ApiException;
+import com.carrotzmarket.api.domain.user.repository.UserRepository;
 import com.carrotzmarket.db.user.UserEntity;
-import com.carrotzmarket.db.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
