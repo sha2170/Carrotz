@@ -8,13 +8,11 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
-    // SELECT * FROM user WHERE id = ? ORDER BY id DESC LIMIT 1
-    Optional<UserEntity> findFirstByIdOrderByDesc(Long id);
+    // SELECT * FROM user WHERE id = ?
+    Optional<UserEntity> findById(Long id);
 
-
-
-    Optional<UserEntity> findByLoginId(String loginId);
-
+    // SELECT * FROM user WHERE loginid = ? AND password = ? AND is_deleted = false;
+    Optional<UserEntity> findByLoginIdAndPasswordAndIsDeletedFalse(String loginId, String password);
 
 
 }

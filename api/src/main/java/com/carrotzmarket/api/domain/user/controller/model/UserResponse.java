@@ -1,4 +1,4 @@
-package com.carrotzmarket.api.domain.user.model;
+package com.carrotzmarket.api.domain.user.controller.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,13 +12,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class UserResponse {
 
-    private Long id;
-
+    // 유저에게 반환될 데이터
+    // password는 민감정보이기 때문에 반환하지 않는다.
     private String loginId;
-
-    private String password;
 
     private String email;
 
