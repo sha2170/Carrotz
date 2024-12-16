@@ -1,40 +1,40 @@
-name: '이슈 생성'
-description: 'Repo에 이슈를 생성하며, 생성된 이슈는 Jira와 연동됩니다.'
+name: '새로운 이슈 생성'
+description: '새로운 이슈를 생성하고, Jira와 연동하여 관리합니다.'
 labels: [feat]
-title: '이슈 이름을 작성해주세요'
+title: '이슈 제목을 입력해주세요.'
 body:
   - type: input
     id: parentKey
     attributes:
-      label: '🎟️ 상위 작업 (Ticket Number)'
-      description: '상위 작업의 Ticket Number를 기입해주세요'
-      placeholder: 'PRJ-00'
+      label: '상위 작업 (Ticket Number)'
+      description: '상위 작업의 Ticket Number를 입력해주세요. (예: KAN-01)'
+      placeholder: 'KAN-01'
     validations:
       required: true
+
+  - type: input
+    id: childKey
+    attributes:
+      label: '하위 작업 (Ticket Number - 선택)'
+      description: 'Jira에 기존 작업이 있다면 해당 Ticket Number를 입력하세요. 없을 경우 새로운 작업이 생성됩니다.'
+      placeholder: 'KAN-02'
+    validations:
+      required: false
 
   - type: input
     id: branch
     attributes:
-      label: '🌳 브랜치명 (Branch)'
-      description: '영어로 브랜치명을 작성해주세요'
-    validations:
-      required: true
-      
-  - type: input
-    id: description
-    attributes:
-      label: '📝 상세 내용(Description)'
-      description: '이슈에 대해서 간략히 설명해주세요'
+      label: '브랜치 (Branch)'
+      description: '영어로 브랜치명을 작성해주세요 (예: feature/your-branch)'
+      placeholder: 'feature/your-branch'
     validations:
       required: true
 
   - type: textarea
-    id: tasks
+    id: description
     attributes:
-      label: '✅ 체크리스트(Tasks)'
-      description: '해당 이슈에 대해 필요한 작업목록을 작성해주세요'
-      value: |
-        - [ ] Task1
-        - [ ] Task2
+      label: '상세 내용 (Description)'
+      description: '이슈에 대해서 간략히 설명해주세요'
+      placeholder: '이슈에 대한 설명을 작성해주세요'
     validations:
       required: true
