@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @EntityScan(basePackages = "com.carrotzmarket.db")
-@EnableJpaRepositories(basePackages = "com.carrotzmarket.db")
+@EnableJpaRepositories(basePackages = {"com.carrotzmarket.db", "com.carrotzmarket.api"})
 public class JpaConfig {
 }

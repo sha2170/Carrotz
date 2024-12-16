@@ -1,39 +1,53 @@
-package com.example.category_service.test;
+package com.carrotzmarket.api.domain.category.controller;
 
-import com.example.category_service.dto.CategoryDto;
-import com.example.category_service.service.CategoryService;
+import com.carrotzmarket.api.domain.category.dto.CategoryDto;
+import com.carrotzmarket.api.domain.category.service.CategoryService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /*
-"동네거리 > 중고거래, 알바, 부동산, 중고차
-                  중고거래 > 인기매물, 디지털기기, 가구/인테리어, 유아동, 여성의류, 여성잡화, 남성패션/잡화, 생활가전, 생활/주방, 스포츠/레저, 취미/게임/음반, 뷰티/미용, 식물, 가공식품, 건강기능식품, 반려동물용품, 디켓/교환권, 도서, 유아도서, 기타 중고물품, 삽니다
+"동네거리 > 중고거래, 알바, 부동산, 중고차 중고거래 > 인기매물, 디지털기기, 가구/인테리어, 유아동, 여성의류, 여성잡화, 남성패션/잡화, 생활가전, 생활/주방, 스포츠/레저, 취미/게임/음반, 뷰티/미용, 식물, 가공식품, 건강기능식품, 반려동물용품, 디켓/교환권, 도서, 유아도서, 기타 중고물품, 삽니다
 동네 이야기 > 모임, 동네 스토리
 동네 먹거리 찾기 > 음식점, 카페/간식
 동네 전문가 찾기 > 운동, 취미/클래스, 미용실, 뷰티, 이사/용달, 청소, 시공, 수리, 학원/과외"
  */
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 public class CategoryControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private CategoryService categoryService;
+
+    @InjectMocks
+    private CategoryController categoryController;
+
+    @BeforeEach
+    void setup() {
+        // MockMvc 설정
+        mockMvc = MockMvcBuilders.standaloneSetup(categoryController).build();
+    }
 
     @Test
     void testGetAllCategories() throws Exception {

@@ -1,4 +1,4 @@
-package com.example.category_service.model;
+package com.carrotzmarket.api.domain.category.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

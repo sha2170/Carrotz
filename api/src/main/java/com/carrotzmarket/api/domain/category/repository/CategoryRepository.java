@@ -1,6 +1,6 @@
-package com.example.category_service.repository;
+package com.carrotzmarket.api.domain.category.repository;
 
-import com.example.category_service.model.Category;
+import com.carrotzmarket.api.domain.category.domain.Category;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;

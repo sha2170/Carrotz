@@ -1,4 +1,4 @@
-package com.example.category_service.dto;
+package com.carrotzmarket.api.domain.category.dto;
 
 import java.util.ArrayList;
 import java.util.List;

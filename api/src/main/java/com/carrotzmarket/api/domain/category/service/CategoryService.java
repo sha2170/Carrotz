@@ -1,8 +1,8 @@
-package com.example.category_service.service;
+package com.carrotzmarket.api.domain.category.service;
 
-import com.example.category_service.dto.CategoryDto;
-import com.example.category_service.model.Category;
-import com.example.category_service.repository.CategoryRepository;
+import com.carrotzmarket.api.domain.category.domain.Category;
+import com.carrotzmarket.api.domain.category.dto.CategoryDto;
+import com.carrotzmarket.api.domain.category.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
