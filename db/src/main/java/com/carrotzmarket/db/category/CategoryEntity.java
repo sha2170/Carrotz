@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "categories")
-public class Category {
+public class CategoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // ID 자동 생성
