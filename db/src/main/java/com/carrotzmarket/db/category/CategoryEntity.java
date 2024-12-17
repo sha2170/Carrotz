@@ -1,4 +1,4 @@
-package com.carrotzmarket.api.domain.category.domain;
+package com.carrotzmarket.db.category;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
