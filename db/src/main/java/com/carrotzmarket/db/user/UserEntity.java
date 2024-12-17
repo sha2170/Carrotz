@@ -46,5 +46,4 @@ public class UserEntity {
     private LocalDateTime createdAt; // 생성 날짜
     private LocalDateTime lastLoginAt; // 최근 로그인 날짜
 
-
 }
