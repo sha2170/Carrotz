@@ -16,10 +16,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     // 제품 이름의 부분으로 검색
     List<ProductEntity> findByNameContaining(String name);
 
-    /*// 특정 카테고리에 따라 필터링
-    List<ProductEntity> findByCategory_DetailCategory_Id(Long categoryId);
-    */
-
     // 제품 상태에 따라 필터링
     List<ProductEntity> findByStatus(ProductStatus status);
 
@@ -34,4 +30,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
     // 특정 사용자와 상태 기준으로 제품 검색
     List<ProductEntity> findByUserIdAndStatus(Long userId, ProductStatus status);
+
+    // 카테고리명을 기준으로 상품을 검색
+    List<ProductEntity> findByCategory_Name(String categoryName);
 }
