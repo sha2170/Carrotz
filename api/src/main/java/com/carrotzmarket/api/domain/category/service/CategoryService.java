@@ -10,10 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 /**
- * CategoryService는 비즈니스 로직을 처리합니다.
- * - 계층 구조로 데이터를 반환
- * - 특정 카테고리 및 하위 카테고리 조회
- * - 키워드 기반 검색
+ * CategoryService
+ * - 비즈니스 로직을 처리합니다.
+ * - 카테고리 계층 구조를 생성하고, 특정 카테고리 또는 검색 기능을 제공합니다.
  */
 @Service
 @Transactional
@@ -26,18 +25,32 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
+    /**
+     * 모든 카테고리를 계층 구조로 조회합니다.
+     * @return 계층 구조의 카테고리 목록
+     */
     public List<CategoryDto> getAllCategories() {
         return buildCategoryTree(categoryRepository.findAll());
     }
 
+    /**
+     * 특정 카테고리와 하위 카테고리를 조회합니다.
+     * @param id 카테고리 ID
+     * @return 카테고리 정보
+     */
     public CategoryDto getCategoryWithSubcategories(Long id) {
         Category category = categoryRepository.findById(id);
         if (category == null) {
-            throw new NoSuchElementException("Category not found");
+            throw new NoSuchElementException("Category with ID " + id + " not found");
         }
         return convertToDto(category);
     }
 
+    /**
+     * 키워드를 포함하는 카테고리를 검색합니다.
+     * @param keyword 검색 키워드
+     * @return 검색된 카테고리 목록
+     */
     public List<CategoryDto> searchCategories(String keyword) {
         return categoryRepository.findByNameContainingIgnoreCase(keyword)
                 .stream()
