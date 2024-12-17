@@ -8,3 +8,4 @@ public interface ProductImageRepository extends JpaRepository<ProductImageEntity
     // 상품 ID로 이미지 조회
     ProductImageEntity findByProductId(Long productId);
 }
+
