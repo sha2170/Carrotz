@@ -22,4 +22,10 @@ public class ProductTransactionRepository {
                 .setParameter("id", id)
                 .getResultList();
     }
+
+    public List<ProductTransactionEntity> findAllSalesHistoryByUserId(Long id) {
+        return em.createQuery("SELECT P FROM ProductTransactionEntity P WHERE P.sellerId = :id AND P.status = 'COMPLETED'", ProductTransactionEntity.class)
+                .setParameter("id", id)
+                .getResultList();
+    }
 }

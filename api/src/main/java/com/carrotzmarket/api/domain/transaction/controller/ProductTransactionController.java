@@ -30,4 +30,13 @@ public class ProductTransactionController {
     public List<ProductTransactionEntity> getPurchaseHistory(@PathVariable("id") Long userId) {
         return service.findAllPurchaseHistory(userId);
     }
+
+    /**
+     * TODO : 쿼리 파라미터 UserId를 받기 보다 세션을 이용하여 UserId를 받아올 수 있도록 수정
+     */
+    @GetMapping("/transaction/history/sales/{id}")
+    public List<ProductTransactionEntity> getSalesHistory(@PathVariable("id") Long userId) {
+        return service.findAllSalesHistory(userId);
+    }
+
 }

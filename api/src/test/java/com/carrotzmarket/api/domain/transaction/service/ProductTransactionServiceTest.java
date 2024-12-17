@@ -76,7 +76,6 @@ class ProductTransactionServiceTest {
         entity1.setStatus(COMPLETED);
         entity2.setStatus(COMPLETED);
 
-        // Mock 설정
         when(repository.findAllPurchaseHistoryByUserId(buyerId)).thenReturn(List.of(entity1, entity2));
 
         // when
@@ -91,12 +90,11 @@ class ProductTransactionServiceTest {
                     assertThat(entity.getStatus()).isEqualTo(COMPLETED);
                 });
 
-        // repository 호출 검증
         verify(repository, times(1)).findAllPurchaseHistoryByUserId(buyerId);
     }
 
     @Test
-    public void 거래내역_테이블에서_거래가_완료되지_않은_내역은_가져올수없다() {
+    public void 거래내역_테이블에서_거래가_완료되지_않은_구매내역은_가져올수없다() {
         // give
         Long buyerId = 1L;
         Long sellerId = 2L;
@@ -125,6 +123,66 @@ class ProductTransactionServiceTest {
                 });
 
         verify(repository, times(1)).findAllPurchaseHistoryByUserId(buyerId);
+    }
+
+    @Test
+    public void 거래내역_테이블을_기반으로_사용자의_ID를_통하여_거래가완료된_판매내역을_가져온다() {
+        // given
+        Long buyerId = 1L;
+        Long sellerId = 2L;
+        Long productId = 3L;
+
+        ProductTransactionEntity entity1 = createEntity(buyerId, sellerId, productId);
+        ProductTransactionEntity entity2 = createEntity(buyerId + 1, sellerId, productId + 1);
+
+        entity1.setStatus(COMPLETED);
+        entity2.setStatus(COMPLETED);
+
+        when(repository.findAllSalesHistoryByUserId(sellerId)).thenReturn(List.of(entity1, entity2));
+
+        // when
+        List<ProductTransactionEntity> purchaseHistory = service.findAllSalesHistory(sellerId);
+
+        // then
+        assertThat(purchaseHistory)
+                .isNotEmpty()
+                .hasSize(2)
+                .allSatisfy(entity -> {
+                    assertThat(entity.getSellerId()).isEqualTo(sellerId);
+                    assertThat(entity.getStatus()).isEqualTo(COMPLETED);
+                });
+
+        verify(repository, times(1)).findAllSalesHistoryByUserId(sellerId);
+    }
+
+    @Test
+    public void 거래내역_테이블에서_거래가완료되지않은_판매내역은_가져올수없다() {
+        // given
+        Long buyerId = 1L;
+        Long sellerId = 2L;
+        Long productId = 3L;
+
+        ProductTransactionEntity entity1 = createEntity(buyerId, sellerId, productId);
+        ProductTransactionEntity entity2 = createEntity(buyerId + 1, sellerId, productId + 1);
+
+        entity1.setStatus(CANCELED);
+        entity2.setStatus(COMPLETED);
+
+        when(repository.findAllSalesHistoryByUserId(sellerId)).thenReturn(List.of(entity2));
+
+        // when
+        List<ProductTransactionEntity> purchaseHistory = service.findAllSalesHistory(sellerId);
+
+        // then
+        assertThat(purchaseHistory)
+                .isNotEmpty()
+                .hasSize(1)
+                .allSatisfy(entity -> {
+                    assertThat(entity.getSellerId()).isEqualTo(sellerId);
+                    assertThat(entity.getStatus()).isEqualTo(COMPLETED);
+                });
+
+        verify(repository, times(1)).findAllSalesHistoryByUserId(sellerId);
     }
 
     private static ProductTransactionEntity createEntity(Long buyerId, Long sellerId, Long productId) {
