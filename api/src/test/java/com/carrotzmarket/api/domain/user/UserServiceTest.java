@@ -101,5 +101,6 @@ public class UserServiceTest {
 
         assertNotNull(response);
         assertEquals("testuser", response.getLoginId());
+
     }
 }
