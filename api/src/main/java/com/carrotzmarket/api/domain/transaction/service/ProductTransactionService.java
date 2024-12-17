@@ -4,6 +4,7 @@ import com.carrotzmarket.api.domain.transaction.converter.ProductTransactionConv
 import com.carrotzmarket.api.domain.transaction.dto.PurchaseRequest;
 import com.carrotzmarket.api.domain.transaction.repository.ProductTransactionRepository;
 import com.carrotzmarket.db.transaction.ProductTransactionEntity;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,5 +28,10 @@ public class ProductTransactionService {
         ProductTransactionEntity entity = converter.toEntity(request);
         return repository.save(entity);
     }
+
+    public List<ProductTransactionEntity> findAllPurchaseHistory(Long userId) {
+        return repository.findAllPurchaseHistoryByUserId(userId);
+    }
+
 
 }
