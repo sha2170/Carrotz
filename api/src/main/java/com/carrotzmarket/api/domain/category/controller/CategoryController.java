@@ -1,7 +1,7 @@
 package com.carrotzmarket.api.domain.category.controller;
 
-import com.example.category_service.dto.CategoryDto;
-import com.example.category_service.service.CategoryService;
+import com.carrotzmarket.api.domain.category.dto.CategoryDto;
+import com.carrotzmarket.api.domain.category.service.CategoryService;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
