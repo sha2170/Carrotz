@@ -29,7 +29,7 @@ public class ProductEntity {
     private Long regionId;
 
     @Column(length = 100, nullable = false)
-    private String name;
+    private String title;
 
     @Lob
     private String description;
@@ -79,11 +79,11 @@ public class ProductEntity {
     }
 
     public String getName() {
-        return name;
+        return title;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.title = title;
     }
 
     public String getDescription() {

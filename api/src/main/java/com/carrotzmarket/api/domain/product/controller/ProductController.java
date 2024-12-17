@@ -42,8 +42,8 @@ public class ProductController {
 
     // 제품 이름으로 검색
     @GetMapping("/search")
-    public List<ProductEntity> searchProducts(@RequestParam String name) {
-        return productService.searchProductByName(name);
+    public List<ProductEntity> searchProducts(@RequestParam String title) {
+        return productService.searchProductByTitle(title);
     }
 
     /*// 특정 카테고리로 검색

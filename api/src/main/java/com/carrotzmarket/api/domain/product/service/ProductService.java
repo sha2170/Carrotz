@@ -32,8 +32,8 @@ public class ProductService {
     }
 
     // 제품 이름 부분으로 검색
-    public List<ProductEntity> searchProductByName(String name) {
-        return productRepository.findByNameContaining(name);
+    public List<ProductEntity> searchProductByTitle(String title) {
+        return productRepository.findByTitleContaining(title);
     }
 
     /*// 특정 카테고리로 검색
