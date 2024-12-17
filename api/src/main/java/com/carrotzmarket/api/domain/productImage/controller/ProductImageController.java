@@ -20,15 +20,27 @@ public class ProductImageController {
     @Autowired
     private ProductImageService productImageService;
 
-    private static final String UPLOAD_DIRECTORY = "/uploads/images/";
+    // 디렉터리 설정 옵션 : 절대 경로
+    private static final String UPLOAD_DIRECTORY = "/Users/tjdgusdk/uploads/";
+
 
     // 상품 이미지 업로드
-    @PostMapping("/upload/{productId}")
-    public ResponseEntity<String> uploadProductImage(@PathVariable Long productId, @RequestParam("file") MultipartFile file) {
+    @PostMapping(value = "/upload/{productId}", consumes = "multipart/form-data")
+    public ResponseEntity<String> uploadProductImage(@PathVariable Long productId,
+                                                     @RequestParam("file") MultipartFile file) {
         try {
+            // 파일명 생성
+            String safeFileName = file.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+
             // 파일 저장 경로 설정
-            Path path = Paths.get(UPLOAD_DIRECTORY + file.getOriginalFilename());
-            Files.write(path, file.getBytes());
+            Path uploadDir = Paths.get(UPLOAD_DIRECTORY);
+            if (!Files.exists(uploadDir)) {
+                Files.createDirectories(uploadDir); // 디렉터리가 없으면 생성
+            }
+
+            Path filePath = uploadDir.resolve(safeFileName);
+            Files.write(filePath, file.getBytes());
+
 
             // 이미지 URL 저장
             String imageUrl = UPLOAD_DIRECTORY + file.getOriginalFilename();
@@ -43,4 +55,5 @@ public class ProductImageController {
             return new ResponseEntity<>("Failed to upload file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }
