@@ -1,4 +1,4 @@
-package com.example.category_service.controller;
+package com.carrotzmarket.api.domain.category.controller;
 
 import com.example.category_service.dto.CategoryDto;
 import com.example.category_service.service.CategoryService;
