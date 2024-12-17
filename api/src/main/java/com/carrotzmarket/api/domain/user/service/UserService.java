@@ -1,9 +1,14 @@
 package com.carrotzmarket.api.domain.user.service;
 
+import com.carrotzmarket.api.common.error.RegionErrorCode;
 import com.carrotzmarket.api.common.error.UserErrorCode;
 import com.carrotzmarket.api.common.exception.ApiException;
 import com.carrotzmarket.api.domain.user.repository.UserRepository;
+import com.carrotzmarket.db.region.RegionEntity;
 import com.carrotzmarket.db.user.UserEntity;
+import com.carrotzmarket.db.user.UserRegionEntity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +19,9 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+
+    @PersistenceContext
+    private EntityManager em;
 
     /**
      * 사용자 등록
@@ -74,5 +82,25 @@ public class UserService {
         } else {
             throw new ApiException(UserErrorCode.USER_NOT_FOUND, "삭제하려는 사용자가 존재하지 않습니다.");
         }
+    }
+
+    public void addUserRegion(Long userId, Long regionId){
+        UserEntity user = em.find(UserEntity.class, userId);
+        RegionEntity region = em.find(RegionEntity.class, regionId);
+
+        /*두 아이디 중 하나라도 없으면 예외 발생
+         *지역을 입력받는 아이디와 입력할 지역이 있어야하기 때문
+         **/
+        if(user == null || region == null){
+            throw new ApiException(RegionErrorCode.REGION_NOT_FOUND, "해당 지역을 찾을 수 없습니다.");
+        }
+
+        UserRegionEntity userRegion = UserRegionEntity.builder()
+                .user(user)
+                .region(region)
+                .build();
+
+        user.getUserRegions().add(userRegion);
+        em.persist(userRegion);
     }
 }

@@ -9,6 +9,8 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -45,5 +47,8 @@ public class UserEntity {
 
     private LocalDateTime createdAt; // 생성 날짜
     private LocalDateTime lastLoginAt; // 최근 로그인 날짜
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserRegionEntity> userRegions = new ArrayList<>();
 
 }
