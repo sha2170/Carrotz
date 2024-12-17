@@ -47,4 +47,11 @@ public class UserBusiness {
         // 조회한 Entity를 Response DTO로 변환
         return userConverter.toResponse(userEntity);
     }
+
+
+    // 사용자 정보에 지역 추가
+    public void addUserRegion(Long userId, Long regionId) {
+        userService.addUserRegion(userId, regionId);
+    }
+
 }
