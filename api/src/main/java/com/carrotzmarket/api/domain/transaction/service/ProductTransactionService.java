@@ -33,5 +33,9 @@ public class ProductTransactionService {
         return repository.findAllPurchaseHistoryByUserId(userId);
     }
 
+    public List<ProductTransactionEntity> findAllSalesHistory(Long userId) {
+        return repository.findAllSalesHistoryByUserId(userId);
+    }
+
 
 }
