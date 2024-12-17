@@ -12,6 +12,8 @@ import com.carrotzmarket.api.domain.user.service.UserService;
 import com.carrotzmarket.db.user.UserEntity;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Business
 @RequiredArgsConstructor
 public class UserBusiness {
@@ -22,6 +24,7 @@ public class UserBusiness {
     // 사용자 등록 로직
     public Api<UserResponse> register(UserRegisterRequest request) {
         UserEntity userEntity = userConverter.toEntity(request); // DTO -> Entity 변환
+        userEntity.setCreatedAt(LocalDateTime.now());
         userService.register(userEntity); // 사용자 저장
         UserResponse response = userConverter.toResponse(userEntity); // Entity -> DTO 변환
         return Api.OK(response); // 응답 성공 포맷으로 변환
