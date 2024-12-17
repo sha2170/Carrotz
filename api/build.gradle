@@ -56,6 +56,7 @@ bootJar {
     mainClass = 'com.carrotzmarket.api.ApiApplication' // 메인 클래스 명시
 }
 
+
 jar {
     enabled = false
 }
