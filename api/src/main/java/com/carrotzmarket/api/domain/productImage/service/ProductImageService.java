@@ -15,4 +15,9 @@ public class ProductImageService {
     public ProductImageEntity saveProductImage(ProductImageEntity productImageEntity) {
         return productImageRepository.save(productImageEntity);
     }
+
+    // 이미지 조회
+    public ProductImageEntity getProductImageByProductId(Long productId) {
+        return productImageRepository.findByProductId(productId);
+    }
 }

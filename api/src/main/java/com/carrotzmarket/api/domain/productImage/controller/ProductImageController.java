@@ -5,7 +5,12 @@ import com.carrotzmarket.api.domain.productImage.service.ProductImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -22,7 +27,6 @@ public class ProductImageController {
 
     // 디렉터리 설정 옵션 : 절대 경로
     private static final String UPLOAD_DIRECTORY = "/Users/tjdgusdk/uploads/";
-
 
     // 상품 이미지 업로드
     @PostMapping(value = "/upload/{productId}", consumes = "multipart/form-data")
@@ -41,9 +45,8 @@ public class ProductImageController {
             Path filePath = uploadDir.resolve(safeFileName);
             Files.write(filePath, file.getBytes());
 
-
             // 이미지 URL 저장
-            String imageUrl = UPLOAD_DIRECTORY + file.getOriginalFilename();
+            String imageUrl = UPLOAD_DIRECTORY + safeFileName;
             ProductImageEntity productImage = new ProductImageEntity();
             productImage.setProductId(productId);
             productImage.setImageUrl(imageUrl);
@@ -56,6 +59,15 @@ public class ProductImageController {
         }
     }
 
+    // 상품 이미지 조회
+    @GetMapping("/{productId}")
+    public ResponseEntity<?> getProductImageByProductId(@PathVariable Long productId) {
+        ProductImageEntity image = productImageService.getProductImageByProductId(productId);
+
+        if (image != null) {
+            return ResponseEntity.ok(image);
+        } else {
+            return ResponseEntity.status(404).body("Image not found for productId: " + productId);
+        }
+    }
 }
-
-
