@@ -22,7 +22,7 @@ public class UserConverter {
                 .password(request.getPassword())
                 .email(request.getEmail())
                 .phone(request.getPhone())
-                .birthday(request.getBirthday() != null ? LocalDate.parse(request.getBirthday()) : null)
+                .birthday(request.getBirthday() != null ? (request.getBirthday()) : null)
                 .profile_iamge_url(request.getProfileImageUrl())
                 .build();
     }
