@@ -1,9 +1,12 @@
 package com.carrotzmarket.db.product;
 
 import com.carrotzmarket.db.product.ProductStatus;
+import com.carrotzmarket.db.transaction.ProductTransactionEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
@@ -52,6 +55,9 @@ public class ProductEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProductStatus status;
+
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ProductTransactionEntity transaction;
 
     // Getters and Setters
     public Long getId() {

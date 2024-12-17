@@ -1,6 +1,7 @@
 package com.carrotzmarket.api.domain.transaction.controller;
 
 import com.carrotzmarket.api.domain.transaction.dto.PurchaseRequest;
+import com.carrotzmarket.api.domain.transaction.dto.TransactionStatusUpdateRequest;
 import com.carrotzmarket.api.domain.transaction.service.ProductTransactionService;
 import com.carrotzmarket.db.transaction.ProductTransactionEntity;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.aspectj.weaver.ast.Literal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,6 +39,11 @@ public class ProductTransactionController {
     @GetMapping("/transaction/history/sales/{id}")
     public List<ProductTransactionEntity> getSalesHistory(@PathVariable("id") Long userId) {
         return service.findAllSalesHistory(userId);
+    }
+
+    @PutMapping("/transaction")
+    public ProductTransactionEntity updateTransaction(@RequestBody TransactionStatusUpdateRequest request) {
+        return service.updateTransaction(request);
     }
 
 }
