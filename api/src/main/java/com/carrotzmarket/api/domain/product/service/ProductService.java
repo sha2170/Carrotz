@@ -61,5 +61,4 @@ public class ProductService {
     public List<ProductEntity> getProductByUserIdAndStatus(Long userId, ProductStatus status) {
         return productRepository.findByUserIdAndStatus(userId, status);
     }
-
 }

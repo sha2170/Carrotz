@@ -38,3 +38,11 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+// 루트 프로젝트의 bootJar 비활성화
+bootJar {
+    enabled = false
+}
+
+
+
