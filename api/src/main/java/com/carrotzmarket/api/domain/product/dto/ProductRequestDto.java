@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * 상품 등록 요청을 위한 DTO 클래스
  * - 상품명, 설명, 가격, 사용자 ID, 지역 ID, 카테고리명을 입력받습니다.
@@ -32,5 +34,5 @@ public class ProductRequestDto {
     @NotNull(message = "지역 ID는 필수 입력 항목입니다.")
     private Long regionId;          // 지역 ID
 
-    private String categoryName;    // 카테고리명 (선택적 필드)
+    private List<String> categoryNames;  // 여러 카테고리명을 받을 수 있도록 수정 (선택적 필드)
 }
