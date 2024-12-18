@@ -1,6 +1,10 @@
 package com.carrotzmarket.api.domain.user.repository;
 
+import com.carrotzmarket.api.common.error.RegionErrorCode;
+import com.carrotzmarket.api.common.exception.ApiException;
+import com.carrotzmarket.db.region.RegionEntity;
 import com.carrotzmarket.db.user.UserEntity;
+import com.carrotzmarket.db.user.UserRegionEntity;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -45,5 +49,25 @@ public class UserRepository{
         if (user != null) {
             em.remove(user);
         }
+    }
+
+    public void addUserRegion(Long userId, Long regionId){
+        UserEntity user = em.find(UserEntity.class, userId);
+        RegionEntity region = em.find(RegionEntity.class, regionId);
+
+        /*두 아이디 중 하나라도 없으면 예외 발생
+         *지역을 입력받는 아이디와 입력할 지역이 있어야하기 때문
+         **/
+        if(user == null || region == null){
+            throw new ApiException(RegionErrorCode.REGION_NOT_FOUND, "해당 지역을 찾을 수 없습니다.");
+        }
+
+        UserRegionEntity userRegion = UserRegionEntity.builder()
+                .user(user)
+                .region(region)
+                .build();
+
+        user.getUserRegions().add(userRegion);
+        em.persist(userRegion);
     }
 }
