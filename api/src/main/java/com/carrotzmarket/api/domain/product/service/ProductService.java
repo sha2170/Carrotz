@@ -1,14 +1,12 @@
 package com.carrotzmarket.api.domain.product.service;
 
-import com.carrotzmarket.api.domain.product.dto.ProductDto;
+import com.carrotzmarket.api.domain.product.dto.ProductCreateRequestDto;
 import com.carrotzmarket.api.domain.product.repository.ProductRepository;
 import com.carrotzmarket.db.product.ProductEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +22,14 @@ public class ProductService {
     private ProductRepository productRepository;
 
     // 제품 등록
-    public Long createProduct(ProductDto productDto) {
-        ProductEntity productEntity = dtoToEntity(productDto);
+    public Long createProduct(ProductCreateRequestDto productCreateRequestDto) {
+        ProductEntity productEntity = dtoToEntity(productCreateRequestDto);
         ProductEntity savedEntity = productRepository.save(productEntity);
         return savedEntity.getId();
     }
 
     // 제품 조회
-    public ProductDto getProductById(Long id) {
+    public ProductCreateRequestDto getProductById(Long id) {
         ProductEntity productEntity = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
 
@@ -39,12 +37,11 @@ public class ProductService {
     }
 
     // Dto -> Entity 변환 메서드
-    private ProductEntity dtoToEntity(ProductDto productDto) {
+    private ProductEntity dtoToEntity(ProductCreateRequestDto productCreateRequestDto) {
         return ProductEntity.builder()
-                .title(productDto.getTitle())
-                .description(productDto.getDescription())
-                .price(productDto.getPrice())
-                .userId(1L) // 기본값: 임시 사용자 ID
+                .title(productCreateRequestDto.getTitle())
+                .description(productCreateRequestDto.getDescription())
+                .price(productCreateRequestDto.getPrice())
                 .regionId(1L) // 기본값: 임시 지역 ID
                 .status(ProductStatus.ON_SALE)
                 .viewCount(0) // 기본값
@@ -55,8 +52,8 @@ public class ProductService {
     }
 
     // Entity -> Dto 변환 메서드
-    private ProductDto entityToDto(ProductEntity productEntity) {
-        return new ProductDto(
+    private ProductCreateRequestDto entityToDto(ProductEntity productEntity) {
+        return new ProductCreateRequestDto(
                 productEntity.getTitle(),
                 productEntity.getDescription(),
                 productEntity.getPrice(),
