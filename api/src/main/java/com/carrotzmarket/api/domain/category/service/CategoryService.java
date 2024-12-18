@@ -1,8 +1,8 @@
 package com.carrotzmarket.api.domain.category.service;
 
-import com.carrotzmarket.api.domain.category.domain.Category;
 import com.carrotzmarket.api.domain.category.dto.CategoryDto;
 import com.carrotzmarket.api.domain.category.repository.CategoryRepository;
+import com.carrotzmarket.db.category.CategoryEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +39,7 @@ public class CategoryService {
      * @return 카테고리 정보
      */
     public CategoryDto getCategoryWithSubcategories(Long id) {
-        Category category = categoryRepository.findById(id);
+        CategoryEntity category = categoryRepository.findById(id);
         if (category == null) {
             throw new NoSuchElementException("Category with ID " + id + " not found");
         }
@@ -58,7 +58,7 @@ public class CategoryService {
                 .toList();
     }
 
-    private CategoryDto convertToDto(Category category) {
+    private CategoryDto convertToDto(CategoryEntity category) {
         return new CategoryDto(
                 category.getId(),
                 category.getName(),
@@ -67,12 +67,12 @@ public class CategoryService {
         );
     }
 
-    private List<CategoryDto> buildCategoryTree(List<Category> categories) {
+    private List<CategoryDto> buildCategoryTree(List<CategoryEntity> categories) {
         Map<Long, CategoryDto> map = new HashMap<>();
         categories.forEach(category -> map.put(category.getId(), convertToDto(category)));
 
         List<CategoryDto> roots = new ArrayList<>();
-        for (Category category : categories) {
+        for (CategoryEntity category : categories) {
             CategoryDto dto = map.get(category.getId());
             if (category.getParent() != null) {
                 map.get(category.getParent().getId()).getChildren().add(dto);
