@@ -16,6 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -38,7 +40,7 @@ public class UserServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        registerRequest = new UserRegisterRequest("testuser", "password", "test@example.com", "010-1234-5678", "1990-01-01", null);
+        registerRequest = new UserRegisterRequest("testuser", "password", "test@example.com", "010-1234-5678", LocalDate.of(1990, 1, 1), null);
         userEntity = UserEntity.builder()
                 .loginid("testuser")
                 .password("password")
