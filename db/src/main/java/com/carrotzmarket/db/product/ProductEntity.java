@@ -1,7 +1,11 @@
 package com.carrotzmarket.db.product;
 
+import com.carrotzmarket.db.category.CategoryEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 import com.carrotzmarket.db.transaction.ProductTransactionEntity;
+
+import jakarta.persistence.*;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +22,9 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "product")
@@ -65,6 +71,18 @@ public class ProductEntity {
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private ProductTransactionEntity transaction;
 
+    // 수정된 부분: 카테고리 다대다 관계
+    @ManyToMany
+    @JoinTable(
+            name = "product_category",  // 중간 테이블 이름
+            joinColumns = @JoinColumn(name = "product_id"),  // 제품 ID
+            inverseJoinColumns = @JoinColumn(name = "category_id")  // 카테고리 ID
+    )
+    private List<CategoryEntity> categories;  // 여러 카테고리를 저장
+
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
     // Getters and Setters
     public Long getId() {
         return id;
@@ -114,46 +132,36 @@ public class ProductEntity {
         this.price = price;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public Long getRegionId() { return regionId; }
+    public void setRegionId(Long regionId) { this.regionId = regionId; }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public int getViewCount() {
-        return viewCount;
-    }
+    public int getPrice() { return price; }
+    public void setPrice(int price) { this.price = price; }
 
-    public void setViewCount(int viewCount) {
-        this.viewCount = viewCount;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public int getFavoriteCount() {
-        return favoriteCount;
-    }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
-    public void setFavoriteCount(int favoriteCount) {
-        this.favoriteCount = favoriteCount;
-    }
+    public int getViewCount() { return viewCount; }
+    public void setViewCount(int viewCount) { this.viewCount = viewCount; }
 
-    public ProductStatus getStatus() {
-        return status;
-    }
+    public int getFavoriteCount() { return favoriteCount; }
+    public void setFavoriteCount(int favoriteCount) { this.favoriteCount = favoriteCount; }
 
-    public void setStatus(ProductStatus status) {
-        this.status = status;
-    }
+    public ProductStatus getStatus() { return status; }
+    public void setStatus(ProductStatus status) { this.status = status; }
 
+    public List<CategoryEntity> getCategories() { return categories; }
+    public void setCategories(List<CategoryEntity> categories) { this.categories = categories; }
 }
-
-
