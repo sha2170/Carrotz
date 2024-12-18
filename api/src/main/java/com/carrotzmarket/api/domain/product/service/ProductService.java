@@ -1,11 +1,17 @@
 package com.carrotzmarket.api.domain.product.service;
 
+import com.carrotzmarket.api.domain.product.dto.ProductCreateRequestDto;
 import com.carrotzmarket.api.domain.product.repository.ProductRepository;
 import com.carrotzmarket.api.domain.category.repository.CategoryRepository;
 import com.carrotzmarket.db.product.ProductEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 import com.carrotzmarket.db.category.CategoryEntity;
 import com.carrotzmarket.api.domain.product.dto.ProductRequestDto;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class ProductService {
 
     @Autowired
@@ -54,6 +61,46 @@ public class ProductService {
      */
     public Optional<ProductEntity> getProductById(Long id) {
         return productRepository.findById(id);
+    // 제품 등록
+    public Long createProduct(ProductCreateRequestDto productCreateRequestDto) {
+        ProductEntity productEntity = dtoToEntity(productCreateRequestDto);
+        ProductEntity savedEntity = productRepository.save(productEntity);
+        return savedEntity.getId();
+    }
+
+    // 제품 조회
+    public ProductCreateRequestDto getProductById(Long id) {
+        ProductEntity productEntity = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
+
+        return entityToDto(productEntity);
+    }
+
+    // Dto -> Entity 변환 메서드
+    private ProductEntity dtoToEntity(ProductCreateRequestDto productCreateRequestDto) {
+        return ProductEntity.builder()
+                .title(productCreateRequestDto.getTitle())
+                .description(productCreateRequestDto.getDescription())
+                .price(productCreateRequestDto.getPrice())
+                .regionId(1L) // 기본값: 임시 지역 ID
+                .status(ProductStatus.ON_SALE)
+                .viewCount(0) // 기본값
+                .favoriteCount(0) // 기본값
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    // Entity -> Dto 변환 메서드
+    private ProductCreateRequestDto entityToDto(ProductEntity productEntity) {
+        return new ProductCreateRequestDto(
+                productEntity.getTitle(),
+                productEntity.getDescription(),
+                productEntity.getPrice(),
+                productEntity.getUserId(),
+                productEntity.getRegionId(),
+                productEntity.getStatus()
+        );
     }
 
     /**
@@ -72,6 +119,9 @@ public class ProductService {
      */
     public List<ProductEntity> searchProductByName(String name) {
         return productRepository.findByNameContaining(name);
+    // 제품 이름 부분으로 검색
+    public List<ProductEntity> searchProductByTitle(String title) {
+        return productRepository.findByTitleContaining(title);
     }
 
     /**

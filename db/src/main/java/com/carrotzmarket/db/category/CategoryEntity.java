@@ -1,9 +1,16 @@
+
 package com.carrotzmarket.db.category;
+
+package com.carrotzmarket.api.domain.category.domain;
+
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
+
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,13 +22,19 @@ import java.util.List;
  */
 @Entity
 @Table(name = "categories")
+
 public class CategoryEntity {
+
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // ID 자동 생성
     private Long id;
 
     @Column(nullable = false)
+
+    @NotBlank // 카테고리 이름은 비어 있을 수 없습니다.
+
     private String name;
 
     @Column
@@ -35,7 +48,11 @@ public class CategoryEntity {
     @ManyToOne
     @JoinColumn(name = "parent_id") // 부모 카테고리의 ID를 저장
     @JsonBackReference
+
     private CategoryEntity parent;
+
+    private Category parent;
+
 
     /**
      * 자식 카테고리와의 연관관계 설정
@@ -45,7 +62,10 @@ public class CategoryEntity {
      */
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
+
     private List<CategoryEntity> children = new ArrayList<>();
+
+    private List<Category> children = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean enabled; // 카테고리 활성화 여부
@@ -53,7 +73,11 @@ public class CategoryEntity {
     /**
      * 기본 생성자
      */
+
     public CategoryEntity() {}
+
+    public Category() {}
+
 
     // Getters and Setters
 
@@ -94,6 +118,19 @@ public class CategoryEntity {
     }
 
     public void setChildren(List<CategoryEntity> children) {
+    public Category getParent() {
+        return parent;
+    }
+
+    public void setParent(Category parent) {
+        this.parent = parent;
+    }
+
+    public List<Category> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Category> children) {
         this.children = children;
     }
 
@@ -112,6 +149,7 @@ public class CategoryEntity {
      * @param child 자식 카테고리
      */
     public void addChild(CategoryEntity child) {
+    public void addChild(Category child) {
         child.setParent(this);
         this.children.add(child);
     }
@@ -123,6 +161,7 @@ public class CategoryEntity {
      * @param child 자식 카테고리
      */
     public void removeChild(CategoryEntity child) {
+    public void removeChild(Category child) {
         child.setParent(null);
         this.children.remove(child);
     }
