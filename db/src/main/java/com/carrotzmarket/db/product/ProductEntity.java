@@ -10,12 +10,18 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "product")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProductEntity {
 
     @Id
@@ -78,11 +84,11 @@ public class ProductEntity {
         this.regionId = regionId;
     }
 
-    public String getName() {
+    public String getTitle() {
         return title;
     }
 
-    public void setName(String name) {
+    public void setTitle(String title) {
         this.title = title;
     }
 
@@ -143,6 +149,5 @@ public class ProductEntity {
     }
 
 }
-
 
 

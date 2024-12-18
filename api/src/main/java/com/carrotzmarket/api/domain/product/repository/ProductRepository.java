@@ -35,4 +35,3 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     // 특정 사용자와 상태 기준으로 제품 검색
     List<ProductEntity> findByUserIdAndStatus(Long userId, ProductStatus status);
 }
-

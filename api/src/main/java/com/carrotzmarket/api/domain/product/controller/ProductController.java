@@ -1,10 +1,15 @@
 package com.carrotzmarket.api.domain.product.controller;
 
+import com.carrotzmarket.api.domain.product.dto.ProductDto;
 import com.carrotzmarket.api.domain.product.service.ProductService;
 import com.carrotzmarket.db.product.ProductEntity;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.carrotzmarket.db.product.ProductStatus;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/products")
 public class ProductController {
 
@@ -23,15 +29,16 @@ public class ProductController {
 
     // 제품 등록
     @PostMapping
-    public ProductEntity createProduct(@RequestBody ProductEntity product) {
-        return productService.createProduct(product);
+    public ResponseEntity<String> createProduct(@RequestBody ProductDto productDto) {
+        Long productId = productService.createProduct(productDto);
+        return ResponseEntity.ok("Product created with ID: " + productId);
     }
-
 
     // 제품 조회
     @GetMapping("/{id}")
-    public Optional<ProductEntity> getProductById(@PathVariable Long id) {
-        return productService.getProductById(id);
+    public ResponseEntity<ProductDto> getProductById(@PathVariable("id") Long id) {
+        ProductDto product = productService.getProductById(id);
+        return ResponseEntity.ok(product);
     }
 
     // 특정 사용자 제품 조회
@@ -78,4 +85,3 @@ public class ProductController {
         return productService.getProductByUserIdAndStatus(userId, status);
     }
 }
-
