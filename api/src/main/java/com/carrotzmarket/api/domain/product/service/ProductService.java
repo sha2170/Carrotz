@@ -59,7 +59,10 @@ public class ProductService {
         return new ProductDto(
                 productEntity.getTitle(),
                 productEntity.getDescription(),
-                productEntity.getPrice()
+                productEntity.getPrice(),
+                productEntity.getUserId(),
+                productEntity.getRegionId(),
+                productEntity.getStatus()
         );
     }
 
