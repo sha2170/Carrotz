@@ -21,4 +21,3 @@ public class ProductImageService {
         return productImageRepository.findByProductId(productId);
     }
 }
-

@@ -14,7 +14,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     List<ProductEntity> findByUserId(Long userId);
 
     // 제품 이름의 부분으로 검색
-    List<ProductEntity> findByNameContaining(String name);
+    List<ProductEntity> findByTitleContaining(String title);
 
     /*// 특정 카테고리에 따라 필터링
     List<ProductEntity> findByCategory_DetailCategory_Id(Long categoryId);
