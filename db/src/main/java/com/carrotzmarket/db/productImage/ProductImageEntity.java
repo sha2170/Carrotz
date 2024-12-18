@@ -42,4 +42,3 @@ public class ProductImageEntity {
         this.imageUrl = imageUrl;
     }
 }
-
