@@ -2,6 +2,7 @@ package com.carrotzmarket.api.domain.productImage.service;
 
 import com.carrotzmarket.db.productImage.ProductImageEntity;
 import com.carrotzmarket.api.domain.productImage.repository.ProductImageRepository;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class ProductImageService {
     }
 
     // 이미지 조회
-    public ProductImageEntity getProductImageByProductId(Long productId) {
+    public List<ProductImageEntity> getProductImageByProductId(Long productId) {
         return productImageRepository.findByProductId(productId);
     }
 }
