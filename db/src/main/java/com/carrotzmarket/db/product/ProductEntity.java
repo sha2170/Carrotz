@@ -5,6 +5,7 @@ import com.carrotzmarket.db.product.ProductStatus;
 import com.carrotzmarket.db.transaction.ProductTransactionEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "product")
@@ -48,10 +49,14 @@ public class ProductEntity {
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private ProductTransactionEntity transaction;
 
-    // 추가된 부분: 카테고리 선택 기능
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = true)
-    private CategoryEntity category;
+    // 수정된 부분: 카테고리 다대다 관계
+    @ManyToMany
+    @JoinTable(
+            name = "product_category",  // 중간 테이블 이름
+            joinColumns = @JoinColumn(name = "product_id"),  // 제품 ID
+            inverseJoinColumns = @JoinColumn(name = "category_id")  // 카테고리 ID
+    )
+    private List<CategoryEntity> categories;  // 여러 카테고리를 저장
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -87,6 +92,6 @@ public class ProductEntity {
     public ProductStatus getStatus() { return status; }
     public void setStatus(ProductStatus status) { this.status = status; }
 
-    public CategoryEntity getCategory() { return category; }
-    public void setCategory(CategoryEntity category) { this.category = category; }
+    public List<CategoryEntity> getCategories() { return categories; }
+    public void setCategories(List<CategoryEntity> categories) { this.categories = categories; }
 }
