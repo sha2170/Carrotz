@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,6 @@ public class CategoryEntity {
     private Long id;
 
     @Column(nullable = false)
-    @NotBlank // 카테고리 이름은 비어 있을 수 없습니다.
     private String name;
 
     @Column
@@ -37,7 +35,7 @@ public class CategoryEntity {
     @ManyToOne
     @JoinColumn(name = "parent_id") // 부모 카테고리의 ID를 저장
     @JsonBackReference
-    private Category parent;
+    private CategoryEntity parent;
 
     /**
      * 자식 카테고리와의 연관관계 설정
@@ -47,7 +45,7 @@ public class CategoryEntity {
      */
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<Category> children = new ArrayList<>();
+    private List<CategoryEntity> children = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean enabled; // 카테고리 활성화 여부
@@ -55,7 +53,7 @@ public class CategoryEntity {
     /**
      * 기본 생성자
      */
-    public Category() {}
+    public CategoryEntity() {}
 
     // Getters and Setters
 
@@ -83,19 +81,19 @@ public class CategoryEntity {
         this.description = description;
     }
 
-    public Category getParent() {
+    public CategoryEntity getParent() {
         return parent;
     }
 
-    public void setParent(Category parent) {
+    public void setParent(CategoryEntity parent) {
         this.parent = parent;
     }
 
-    public List<Category> getChildren() {
+    public List<CategoryEntity> getChildren() {
         return children;
     }
 
-    public void setChildren(List<Category> children) {
+    public void setChildren(List<CategoryEntity> children) {
         this.children = children;
     }
 
@@ -113,7 +111,7 @@ public class CategoryEntity {
      *
      * @param child 자식 카테고리
      */
-    public void addChild(Category child) {
+    public void addChild(CategoryEntity child) {
         child.setParent(this);
         this.children.add(child);
     }
@@ -124,7 +122,7 @@ public class CategoryEntity {
      *
      * @param child 자식 카테고리
      */
-    public void removeChild(Category child) {
+    public void removeChild(CategoryEntity child) {
         child.setParent(null);
         this.children.remove(child);
     }
