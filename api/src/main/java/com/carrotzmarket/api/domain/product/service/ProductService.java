@@ -1,14 +1,17 @@
 package com.carrotzmarket.api.domain.product.service;
 
 import com.carrotzmarket.api.domain.product.repository.ProductRepository;
-import com.carrotzmarket.api.domain.category.repository.CategoryRepository;  // CategoryRepository 추가
+import com.carrotzmarket.api.domain.category.repository.CategoryRepository;
 import com.carrotzmarket.db.product.ProductEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 import com.carrotzmarket.db.category.CategoryEntity;
-import com.carrotzmarket.api.domain.product.dto.ProductRequestDto;  // ProductRequestDto 추가
+import com.carrotzmarket.api.domain.product.dto.ProductRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -26,9 +29,11 @@ public class ProductService {
      * @return 등록된 상품 정보
      */
     public ProductEntity createProduct(ProductRequestDto productRequestDto) {
-        // 카테고리명을 기준으로 카테고리 조회
-        CategoryEntity category = categoryRepository.findByName(productRequestDto.getCategoryName());
-        
+        // 여러 카테고리명을 기준으로 카테고리 조회
+        List<CategoryEntity> categories = productRequestDto.getCategoryNames().stream()
+                .map(categoryName -> categoryRepository.findByName(categoryName))
+                .collect(Collectors.toList());
+
         // ProductEntity 생성
         ProductEntity product = new ProductEntity();
         product.setName(productRequestDto.getName());
@@ -36,10 +41,10 @@ public class ProductService {
         product.setPrice(productRequestDto.getPrice());
         product.setUserId(productRequestDto.getUserId());
         product.setRegionId(productRequestDto.getRegionId());
-        product.setCategory(category);  // 카테고리 설정
+        product.setCategories(categories);  // 여러 카테고리 설정
 
         // 상품 저장
-        return productRepository.save(product);  
+        return productRepository.save(product);
     }
 
     /**
