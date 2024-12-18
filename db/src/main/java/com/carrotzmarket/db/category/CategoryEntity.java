@@ -1,17 +1,17 @@
 package com.carrotzmarket.db.category;
 
-package com.carrotzmarket.db.category;
-
-package com.carrotzmarket.api.domain.category.domain;
-
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import jakarta.persistence.*;
-
-import jakarta.validation.constraints.NotBlank;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,21 +21,16 @@ import java.util.List;
  * - 계층 구조를 지원하기 위해 부모-자식 관계를 설정합니다.
  * - 직렬화 시 무한 순환 방지를 위해 @JsonManagedReference와 @JsonBackReference를 사용합니다.
  */
+
 @Entity
 @Table(name = "categories")
-
 public class CategoryEntity {
-
-public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // ID 자동 생성
     private Long id;
 
     @Column(nullable = false)
-
-    @NotBlank // 카테고리 이름은 비어 있을 수 없습니다.
-
     private String name;
 
     @Column
@@ -49,11 +44,7 @@ public class Category {
     @ManyToOne
     @JoinColumn(name = "parent_id") // 부모 카테고리의 ID를 저장
     @JsonBackReference
-
     private CategoryEntity parent;
-
-    private Category parent;
-
 
     /**
      * 자식 카테고리와의 연관관계 설정
@@ -63,10 +54,7 @@ public class Category {
      */
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-
     private List<CategoryEntity> children = new ArrayList<>();
-
-    private List<Category> children = new ArrayList<>();
 
     @Column(nullable = false)
     private boolean enabled; // 카테고리 활성화 여부
@@ -74,11 +62,7 @@ public class Category {
     /**
      * 기본 생성자
      */
-
     public CategoryEntity() {}
-
-    public Category() {}
-
 
     // Getters and Setters
 
@@ -119,19 +103,6 @@ public class Category {
     }
 
     public void setChildren(List<CategoryEntity> children) {
-    public Category getParent() {
-        return parent;
-    }
-
-    public void setParent(Category parent) {
-        this.parent = parent;
-    }
-
-    public List<Category> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<Category> children) {
         this.children = children;
     }
 
@@ -150,7 +121,6 @@ public class Category {
      * @param child 자식 카테고리
      */
     public void addChild(CategoryEntity child) {
-    public void addChild(Category child) {
         child.setParent(this);
         this.children.add(child);
     }
@@ -162,7 +132,6 @@ public class Category {
      * @param child 자식 카테고리
      */
     public void removeChild(CategoryEntity child) {
-    public void removeChild(Category child) {
         child.setParent(null);
         this.children.remove(child);
     }

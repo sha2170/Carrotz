@@ -1,12 +1,9 @@
 package com.carrotzmarket.api.domain.user.service;
 
-import com.carrotzmarket.api.common.error.RegionErrorCode;
 import com.carrotzmarket.api.common.error.UserErrorCode;
 import com.carrotzmarket.api.common.exception.ApiException;
 import com.carrotzmarket.api.domain.user.repository.UserRepository;
-import com.carrotzmarket.db.region.RegionEntity;
 import com.carrotzmarket.db.user.UserEntity;
-import com.carrotzmarket.db.user.UserRegionEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;

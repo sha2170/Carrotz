@@ -2,7 +2,9 @@ package com.carrotzmarket.api.domain.productImage.controller;
 
 import com.carrotzmarket.db.productImage.ProductImageEntity;
 import com.carrotzmarket.api.domain.productImage.service.ProductImageService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,8 +27,8 @@ public class ProductImageController {
     @Autowired
     private ProductImageService productImageService;
 
-    // 디렉터리 설정 옵션 : 절대 경로
-    private static final String UPLOAD_DIRECTORY = "/Users/tjdgusdk/uploads/";
+    @Value("${file.dir}")
+    private String UPLOAD_DIRECTORY;
 
     // 상품 이미지 업로드
     @PostMapping(value = "/upload/{productId}", consumes = "multipart/form-data")
@@ -62,7 +64,7 @@ public class ProductImageController {
     // 상품 이미지 조회
     @GetMapping("/{productId}")
     public ResponseEntity<?> getProductImageByProductId(@PathVariable Long productId) {
-        ProductImageEntity image = productImageService.getProductImageByProductId(productId);
+        List<ProductImageEntity> image = productImageService.getProductImageByProductId(productId);
 
         if (image != null) {
             return ResponseEntity.ok(image);

@@ -1,11 +1,13 @@
 package com.carrotzmarket.api.domain.product.dto;
 
+import com.carrotzmarket.db.category.CategoryEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public class ProductCreateRequestDto {
 
     @NotNull(message = "상품 제목은 필수입니다.")
@@ -29,6 +32,8 @@ public class ProductCreateRequestDto {
     private Long userId;
 
     private Long regionId;
+
+    private String category;
 
     private ProductStatus status;
 }

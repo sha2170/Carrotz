@@ -5,8 +5,10 @@ import com.carrotzmarket.db.product.ProductStatus;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
+@Component
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
@@ -32,5 +34,5 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     List<ProductEntity> findByUserIdAndStatus(Long userId, ProductStatus status);
 
     // 카테고리명을 기준으로 상품을 검색
-    List<ProductEntity> findByCategory_Name(String categoryName);
+    List<ProductEntity> findByCategories_Name(String categoryName);
 }
