@@ -3,6 +3,7 @@ package com.carrotzmarket.api.domain.product.controller;
 import com.carrotzmarket.api.domain.product.dto.ProductRequestDto;
 import com.carrotzmarket.api.domain.product.service.ProductService;
 import com.carrotzmarket.db.product.ProductEntity;
+import com.carrotzmarket.db.product.ProductStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
