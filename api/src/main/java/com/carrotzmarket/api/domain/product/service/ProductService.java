@@ -3,10 +3,13 @@ package com.carrotzmarket.api.domain.product.service;
 import com.carrotzmarket.api.domain.product.dto.ProductCreateRequestDto;
 import com.carrotzmarket.api.domain.product.repository.ProductRepository;
 import com.carrotzmarket.api.domain.category.repository.CategoryRepository;
+import com.carrotzmarket.api.domain.region.service.RegionService;
+import com.carrotzmarket.db.category.CategoryEntity;
 import com.carrotzmarket.db.product.ProductEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final RegionService regionService;
 
     public ProductEntity createProduct(ProductCreateRequestDto request) {
         // DTO -> Entity 변환
@@ -107,4 +111,79 @@ public class ProductService {
     public List<ProductEntity> getProductByCategory(String categoryName) {
         return productRepository.findByCategories_Name(categoryName);
     }
+
+    // 가격 범위로 상품 필터링
+    public List<ProductEntity> getProductsByPriceRange(Integer minPrice, Integer maxPrice) {
+        if (minPrice == null) minPrice = 0; // 기본 최소값
+        if (maxPrice == null) maxPrice = Integer.MAX_VALUE; // 기본 최대값
+        return productRepository.findByPriceBetween(minPrice, maxPrice);
+    }
+
+    // 정렬 범위로 상품 필터링
+    public List<ProductEntity> getProductsSortedBy(String sortBy, Integer minPrice, Integer maxPrice) {
+        if (minPrice == null) minPrice = 0;
+        if (maxPrice == null) maxPrice = Integer.MAX_VALUE;
+
+        if ("newest".equalsIgnoreCase(sortBy)) {
+            return productRepository.findByPriceBetweenOrderByCreatedAtDesc(minPrice, maxPrice);
+        } else if ("popular".equalsIgnoreCase(sortBy)) {
+            return productRepository.findByPriceBetweenOrderByFavoriteCountDesc(minPrice, maxPrice);
+        } else {
+            throw new IllegalArgumentException("Invalid sortBy value. Use 'newest' or 'popular'.");
+        }
+    }
+
+    // 카테고리 기반 상품 필터링
+    public List<ProductEntity> getProductsByCategory(Long categoryId, Integer minPrice, Integer maxPrice, String sortBy) {
+        if (minPrice == null) minPrice = 0;
+        if (maxPrice == null) maxPrice = Integer.MAX_VALUE;
+
+        // 하위 카테고리 포함한 ID 목록 조회
+        List<Long> categoryIds = getCategoryHierarchy(categoryId);
+
+        // 정렬 조건에 따라 상품 조회
+        if ("newest".equalsIgnoreCase(sortBy)) {
+            return productRepository.findByCategories_IdInAndPriceBetweenOrderByCreatedAtDesc(categoryIds, minPrice, maxPrice);
+        } else if ("popular".equalsIgnoreCase(sortBy)) {
+            return productRepository.findByCategories_IdInAndPriceBetweenOrderByFavoriteCountDesc(categoryIds, minPrice, maxPrice);
+        } else {
+            return productRepository.findByCategories_IdInAndPriceBetween(categoryIds, minPrice, maxPrice);
+        }
+    }
+
+    // 하위 카테고리 탐색
+    private List<Long> getCategoryHierarchy(Long categoryId) {
+        // Optional에서 CategoryEntity 추출
+        CategoryEntity category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Category not found with ID: " + categoryId));
+        List<Long> categoryIds = new ArrayList<>();
+        collectCategoryIds(category, categoryIds);
+        return categoryIds;
+    }
+
+    private void collectCategoryIds(CategoryEntity category, List<Long> categoryIds) {
+        categoryIds.add(category.getId());
+        for (CategoryEntity child : category.getChildren()) {
+            collectCategoryIds(child, categoryIds);
+        }
+    }
+
+    // 지역 기반 상품 필터링 로직 추가
+    public List<ProductEntity> getProductsByRegion(Long regionId, Integer minPrice, Integer maxPrice, String sortBy) {
+        if (minPrice == null) minPrice = 0; // 기본 최소값
+        if (maxPrice == null) maxPrice = Integer.MAX_VALUE; // 기본 최대값
+
+        // 하위 지역 포함한 ID 목록 조회
+        List<Long> regionIds = regionService.getRegionHierarchy(regionId);
+
+        // 정렬 조건에 따라 상품 조회
+        if ("newest".equalsIgnoreCase(sortBy)) {
+            return productRepository.findByRegionIdInAndPriceBetweenOrderByCreatedAtDesc(regionIds, minPrice, maxPrice);
+        } else if ("popular".equalsIgnoreCase(sortBy)) {
+            return productRepository.findByRegionIdInAndPriceBetweenOrderByFavoriteCountDesc(regionIds, minPrice, maxPrice);
+        } else {
+            return productRepository.findByRegionIdInAndPriceBetween(regionIds, minPrice, maxPrice);
+        }
+    }
+
 }
