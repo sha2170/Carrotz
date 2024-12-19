@@ -35,4 +35,33 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
     // 카테고리명을 기준으로 상품을 검색
     List<ProductEntity> findByCategories_Name(String categoryName);
+
+    // 가격 범위로 상품 검색
+    List<ProductEntity> findByPriceBetween(int minPrice, int maxPrice);
+
+    // 정렬 범위로 상품 검색
+    List<ProductEntity> findByPriceBetweenOrderByCreatedAtDesc(int minPrice, int maxPrice);
+    List<ProductEntity> findByPriceBetweenOrderByFavoriteCountDesc(int minPrice, int maxPrice);
+
+    // 카테고리 및 가격 범위로 상품 검색
+    List<ProductEntity> findByCategories_IdInAndPriceBetween(List<Long> categoryIds, int minPrice, int maxPrice);
+
+    // 카테고리 및 가격 범위로 최신순 정렬
+    List<ProductEntity> findByCategories_IdInAndPriceBetweenOrderByCreatedAtDesc(List<Long> categoryIds, int minPrice, int maxPrice);
+
+    // 카테고리 및 가격 범위로 인기순 정렬
+    List<ProductEntity> findByCategories_IdInAndPriceBetweenOrderByFavoriteCountDesc(List<Long> categoryIds, int minPrice, int maxPrice);
+
+    // 지역 기반 상품 검색
+    List<ProductEntity> findByRegionIdIn(List<Long> regionIds);
+
+    // 지역 및 가격 범위로 상품 검색
+    List<ProductEntity> findByRegionIdInAndPriceBetween(List<Long> regionIds, int minPrice, int maxPrice);
+
+    // 지역 및 가격 범위로 최신순 정렬
+    List<ProductEntity> findByRegionIdInAndPriceBetweenOrderByCreatedAtDesc(List<Long> regionIds, int minPrice, int maxPrice);
+
+    // 지역 및 가격 범위로 인기순 정렬
+    List<ProductEntity> findByRegionIdInAndPriceBetweenOrderByFavoriteCountDesc(List<Long> regionIds, int minPrice, int maxPrice);
+
 }

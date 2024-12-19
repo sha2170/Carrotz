@@ -1,7 +1,8 @@
 package com.carrotzmarket.api.domain.category.initializer;
 
-import com.carrotzmarket.api.domain.category.repository.CategoryRepository;
+
 import com.carrotzmarket.db.category.CategoryEntity;
+import com.carrotzmarket.api.domain.category.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

@@ -208,7 +208,7 @@ class ProductTransactionServiceTest {
         product.setId(1L);
         product.setUserId(1L);
         product.setRegionId(1L);
-        product.setName("책상");
+        product.setTitle("책상");
         product.setDescription("설명");
         product.setPrice(1000);
         product.setCreatedAt(LocalDateTime.now());
