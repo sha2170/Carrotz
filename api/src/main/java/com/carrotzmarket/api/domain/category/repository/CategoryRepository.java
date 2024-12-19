@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class CategoryRepository {
@@ -21,17 +22,17 @@ public class CategoryRepository {
      */
     public List<CategoryEntity> findAll() {
         return entityManager.createQuery(
-                "SELECT c FROM CategoryEntity c LEFT JOIN FETCH c.children", CategoryEntity.class)
+                        "SELECT c FROM CategoryEntity c LEFT JOIN FETCH c.children", CategoryEntity.class)
                 .getResultList();
     }
 
     /**
      * ID로 카테고리를 조회합니다.
      * @param id 조회할 카테고리의 ID
-     * @return CategoryEntity
+     * @return Optional<CategoryEntity>
      */
-    public CategoryEntity findById(Long id) {
-        return entityManager.find(CategoryEntity.class, id);
+    public Optional<CategoryEntity> findById(Long id) {
+        return Optional.ofNullable(entityManager.find(CategoryEntity.class, id));
     }
 
     /**
@@ -41,7 +42,7 @@ public class CategoryRepository {
      */
     public CategoryEntity findByName(String categoryName) {
         return entityManager.createQuery(
-                "SELECT c FROM CategoryEntity c WHERE c.name = :categoryName", CategoryEntity.class)
+                        "SELECT c FROM CategoryEntity c WHERE c.name = :categoryName", CategoryEntity.class)
                 .setParameter("categoryName", categoryName)
                 .getSingleResult();
     }
