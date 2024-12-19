@@ -54,6 +54,11 @@ public class ProductEntity {
     @Column(nullable = false)
     private int price;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private CategoryEntity category;
+
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

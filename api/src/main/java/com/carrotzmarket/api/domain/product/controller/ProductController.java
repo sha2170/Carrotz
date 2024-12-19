@@ -1,6 +1,8 @@
 package com.carrotzmarket.api.domain.product.controller;
 
 import com.carrotzmarket.api.domain.product.dto.ProductCreateRequestDto;
+import com.carrotzmarket.api.domain.product.dto.ProductResponseDto;
+import com.carrotzmarket.api.domain.product.dto.ProductUpdateRequestDto;
 import com.carrotzmarket.api.domain.product.service.ProductService;
 import com.carrotzmarket.db.product.ProductEntity;
 import jakarta.validation.Valid;
@@ -32,10 +34,38 @@ public class ProductController {
 
     // 제품 조회
     @GetMapping("/{id}")
-    public ResponseEntity<ProductEntity> getProductById(@PathVariable("id") Long id) {
-        ProductEntity product = productService.getProductById(id);
-        return ResponseEntity.ok(product);
+    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long id) {
+        ProductResponseDto response = productService.getProductById(id);
+        return ResponseEntity.ok(response);
     }
+
+    // 제품 수정
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProductResponseDto> updateProduct(
+            @PathVariable Long id,
+            @RequestBody @Valid ProductUpdateRequestDto updateRequest) {
+        ProductResponseDto updatedProduct = productService.updateProduct(id, updateRequest);
+        return ResponseEntity.ok(updatedProduct);
+    }
+
+    // 제품 삭제
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.ok("Product deleted successfully.");
+    }
+
+
+    // 거래 상태 변경
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ProductResponseDto> updateProductStatus(
+            @PathVariable Long id,
+            @RequestParam ProductStatus status) {
+        ProductResponseDto updatedProduct = productService.updateProductStatus(id, status);
+        return ResponseEntity.ok(updatedProduct);
+    }
+
+
 
     // 유효성 검사 실패 시 오류 응답 반환
     @ExceptionHandler(MethodArgumentNotValidException.class)

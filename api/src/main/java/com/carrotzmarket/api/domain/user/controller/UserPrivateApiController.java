@@ -7,6 +7,7 @@ import com.carrotzmarket.api.common.exception.ApiException;
 import com.carrotzmarket.api.domain.user.business.UserBusiness;
 import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
 import com.carrotzmarket.api.domain.user.controller.model.UserSessionInfo;
+import com.carrotzmarket.api.domain.user.controller.model.UserUpdateRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -45,5 +46,18 @@ public class UserPrivateApiController {
 
         UserSessionInfo sessionInfo = (UserSessionInfo) session.getAttribute("userSession");
         return Api.OK(sessionInfo);
+    }
+
+
+    @PutMapping("/update")
+    public Api<UserResponse> updateUser(@RequestParam String loginId, @RequestBody UserUpdateRequest request) {
+        UserResponse response = userBusiness.updateUser(loginId, request);
+        return Api.OK(response);
+    }
+
+    @DeleteMapping("/delete")
+    public Api<String> deleteUser(@RequestParam String loginId) {
+        userBusiness.deleteUser(loginId);
+        return Api.OK("유저의 계정이 삭제되었습니다.");
     }
 }

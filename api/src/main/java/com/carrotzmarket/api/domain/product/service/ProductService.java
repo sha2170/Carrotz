@@ -1,6 +1,8 @@
 package com.carrotzmarket.api.domain.product.service;
 
 import com.carrotzmarket.api.domain.product.dto.ProductCreateRequestDto;
+import com.carrotzmarket.api.domain.product.dto.ProductResponseDto;
+import com.carrotzmarket.api.domain.product.dto.ProductUpdateRequestDto;
 import com.carrotzmarket.api.domain.product.repository.ProductRepository;
 import com.carrotzmarket.api.domain.category.repository.CategoryRepository;
 import com.carrotzmarket.api.domain.region.service.RegionService;
@@ -13,8 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @Service
@@ -26,10 +32,19 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final RegionService regionService;
 
+    // ProductEntity를 조회하는 메서드
+    public ProductEntity findProductById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
+    }
+
     public ProductEntity createProduct(ProductCreateRequestDto request) {
+        // 카테고리 조회
+        CategoryEntity category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Category not found with ID: " + request.getCategoryId()));
+
         // DTO -> Entity 변환
         ProductEntity product = ProductEntity.builder()
-                .id(null)
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .price(request.getPrice())
@@ -51,14 +66,82 @@ public class ProductService {
             product.setCategories(categoryEntities); // 상품에 카테고리 리스트 추가
         }
 
+                .category(category) // 카테고리 설정
+                .status(request.getStatus())
+                .build();
+
         // 상품 저장
         return productRepository.save(product);
     }
 
     // 제품 조회
-    public ProductEntity getProductById(Long id) {
-        return productRepository.findById(id)
+    public ProductResponseDto getProductById(Long id) {
+        ProductEntity product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
+
+        return new ProductResponseDto(
+                product.getId(),
+                product.getTitle(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getCategory() != null ? product.getCategory().getId() : null,
+                product.getUserId(),
+                product.getRegionId(),
+                product.getStatus()
+        );
+    }
+
+    // 제품 수정
+    @Transactional
+    public ProductResponseDto updateProduct(Long id, ProductUpdateRequestDto request) {
+        ProductEntity product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
+
+        // 사용자가 수정할 항목 업데이트
+        product.setTitle(request.getTitle());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+
+        productRepository.save(product); // JPA 변경감지로 저장
+        return new ProductResponseDto(
+                product.getId(),
+                product.getTitle(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getCategory() != null ? product.getCategory().getId() : null,
+                product.getUserId(),
+                product.getRegionId(),
+                product.getStatus()
+        );
+    }
+
+    // 제품 삭제
+    @Transactional
+    public void deleteProduct(Long id) {
+        ProductEntity product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
+        productRepository.delete(product);
+    }
+
+    // 거래 상태 변경
+    @Transactional
+    public ProductResponseDto updateProductStatus(Long id, ProductStatus status) {
+        ProductEntity product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
+
+        product.setStatus(status);
+        productRepository.save(product);
+
+        return new ProductResponseDto(
+                product.getId(),
+                product.getTitle(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getCategory() != null ? product.getCategory().getId() : null,
+                product.getUserId(),
+                product.getRegionId(),
+                product.getStatus()
+        );
     }
 
     // Dto -> Entity 변환 메서드
