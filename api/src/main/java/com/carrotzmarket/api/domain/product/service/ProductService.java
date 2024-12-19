@@ -125,40 +125,10 @@ public class ProductService {
         );
     }
 
-    // Dto -> Entity 변환 메서드
-    private ProductEntity dtoToEntity(ProductCreateRequestDto productCreateRequestDto) {
-        return ProductEntity.builder()
-                .title(productCreateRequestDto.getTitle())
-                .description(productCreateRequestDto.getDescription())
-                .price(productCreateRequestDto.getPrice())
-                .regionId(1L) // 기본값: 임시 지역 ID
-                .status(ProductStatus.ON_SALE)
-                .viewCount(0) // 기본값
-                .favoriteCount(0) // 기본값
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-    }
-
-    // Entity -> Dto 변환 메서드
-    private ProductCreateRequestDto entityToDto(ProductEntity productEntity) {
-        return ProductCreateRequestDto.builder()
-                .title(productEntity.getTitle())
-                .description(productEntity.getDescription())
-                .price(productEntity.getPrice())
-                .userId(productEntity.getUserId())
-                .regionId(productEntity.getRegionId())
-                .status(productEntity.getStatus())
-                .build();
-    }
-
     public List<ProductEntity> getProductByUserId(Long userId) {
         return productRepository.findByUserId(userId);
     }
 
-    public List<ProductEntity> searchProductByName(String name) {
-        return productRepository.findByTitleContaining(name);
-    }
 
     public List<ProductEntity> searchProductByTitle(String title) {
         return productRepository.findByTitleContaining(title);

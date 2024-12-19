@@ -29,7 +29,6 @@ public class CategoryRepository {
     /**
      * ID로 카테고리를 조회합니다.
      * @param id 조회할 카테고리의 ID
-     * @return CategoryEntity
      */
     public Optional<CategoryEntity> findById(Long id) {
         return Optional.ofNullable(entityManager.find(CategoryEntity.class, id));
@@ -38,15 +37,14 @@ public class CategoryRepository {
     /**
      * 카테고리명을 기준으로 카테고리를 조회합니다.
      * @param categoryName 카테고리명
-     * @return CategoryEntity
      */
-    public CategoryEntity findByName(String categoryName) {
-        return entityManager.createQuery(
-                "SELECT c FROM CategoryEntity c WHERE c.name = :categoryName", CategoryEntity.class)
+    public Optional<CategoryEntity> findByName(String categoryName) {
+        List<CategoryEntity> results = entityManager.createQuery(
+                        "SELECT c FROM CategoryEntity c WHERE c.name = :categoryName", CategoryEntity.class)
                 .setParameter("categoryName", categoryName)
-                .getSingleResult();
+                .getResultList();
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
-
     /**
      * 키워드를 포함하는 카테고리를 조회합니다.
      * @param keyword 검색 키워드
@@ -64,11 +62,12 @@ public class CategoryRepository {
      * @param category 저장할 카테고리 엔티티
      */
     @Transactional
-    public void save(CategoryEntity category) {
+    public CategoryEntity save(CategoryEntity category) {
         if (category.getId() == null) {
             entityManager.persist(category);
+            return category; // 새로 저장된 엔티티 반환
         } else {
-            entityManager.merge(category);
+            return entityManager.merge(category); // 병합된 엔티티 반환
         }
     }
 

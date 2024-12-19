@@ -1,6 +1,7 @@
 package com.carrotzmarket.api.domain.user.repository;
 
 import com.carrotzmarket.api.common.error.RegionErrorCode;
+import com.carrotzmarket.api.common.error.UserErrorCode;
 import com.carrotzmarket.api.common.exception.ApiException;
 import com.carrotzmarket.db.region.RegionEntity;
 import com.carrotzmarket.db.user.UserEntity;
@@ -31,7 +32,6 @@ public class UserRepository{
         return em.createQuery("SELECT u FROM UserEntity u", UserEntity.class).getResultList();
     }
 
-
     public Optional<UserEntity> findByLoginId(String loginId) {
         try {
             UserEntity user = em.createQuery("SELECT u FROM UserEntity u WHERE u.loginid = :loginId", UserEntity.class)
@@ -43,13 +43,21 @@ public class UserRepository{
         }
     }
 
-
-    public void deleteById(Long id) {
-        UserEntity user = em.find(UserEntity.class, id);
-        if (user != null) {
-            em.remove(user);
-        }
+    public void deleteUserRegionsByUserId(Long userId) {
+        em.createQuery("DELETE FROM UserRegionEntity ur WHERE ur.user.id = :userId")
+                .setParameter("userId", userId)
+                .executeUpdate();
     }
+
+    public void deleteByLoginId(String loginId) {
+        UserEntity user = em.createQuery("SELECT u FROM UserEntity u WHERE u.loginid = :loginId", UserEntity.class)
+                .setParameter("loginId", loginId)
+                .getSingleResult();
+
+        deleteUserRegionsByUserId(user.getId());
+        em.remove(user);
+    }
+
 
     public void addUserRegion(Long userId, Long regionId){
         UserEntity user = em.find(UserEntity.class, userId);
@@ -69,5 +77,10 @@ public class UserRepository{
 
         user.getUserRegions().add(userRegion);
         em.persist(userRegion);
+    }
+
+    public Optional<RegionEntity> findRegionById(Long regionid){
+        RegionEntity region = em.find(RegionEntity.class, regionid);
+        return Optional.ofNullable(region);
     }
 }

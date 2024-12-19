@@ -1,11 +1,11 @@
 package com.carrotzmarket.api.domain.user.service;
 
+import com.carrotzmarket.api.common.error.RegionErrorCode;
 import com.carrotzmarket.api.common.error.UserErrorCode;
 import com.carrotzmarket.api.common.exception.ApiException;
 import com.carrotzmarket.api.domain.user.repository.UserRepository;
+import com.carrotzmarket.db.region.RegionEntity;
 import com.carrotzmarket.db.user.UserEntity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,17 +68,27 @@ public class UserService {
 
     /**
      * 사용자 삭제
-     * @param userId 삭제할 사용자 ID
+     * @param loginId 삭제할 사용자 ID
      */
-    public void deleteUser(Long userId) {
-        // 사용자 조회 후 삭제
-        Optional<UserEntity> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            userRepository.deleteById(userId);
-        } else {
-            throw new ApiException(UserErrorCode.USER_NOT_FOUND, "삭제하려는 사용자가 존재하지 않습니다.");
-        }
+    public void deleteUser(String loginId) {
+        userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, " 삭제 대상이 없습니다."));
+
+        userRepository.deleteByLoginId(loginId);
     }
 
+    // 사용자 정보 업데이트용 save 메서드
+    public void save(UserEntity user){
+        userRepository.save(user);
+    }
 
+    public RegionEntity findRegionById(Long regionId){
+        return userRepository.findRegionById(regionId)
+                .orElseThrow(() -> new ApiException(RegionErrorCode.REGION_NOT_FOUND,"해당 지역을 찾을 수 없음"));
+    }
+
+    public UserEntity findByLoginId(String loginId) {
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "해당 로그인 ID의 사용자를 찾을 수 없습니다."));
+    }
 }
