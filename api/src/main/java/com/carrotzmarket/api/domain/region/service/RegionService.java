@@ -8,6 +8,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -60,5 +61,24 @@ public class RegionService {
     public List<RegionEntity> findAllRegions(){
         return em.createQuery("SELECT r FROM RegionEntity r", RegionEntity.class)
                 .getResultList();
+    }
+
+    // 특정 지역 및 하위 지역에 포함된 지역 ID 목록 반환
+    public List<Long> getRegionHierarchy(Long regionId) {
+        RegionEntity region = findById(regionId);
+        if (region == null) {
+            throw new IllegalArgumentException("Region with ID " + regionId + " not found.");
+        }
+
+        List<Long> regionIds = new ArrayList<>();
+        collectRegionIds(region, regionIds);
+        return regionIds;
+    }
+
+    private void collectRegionIds(RegionEntity region, List<Long> regionIds) {
+        regionIds.add(region.getId());
+        for (RegionEntity child : region.getChildRegions()) {
+            collectRegionIds(child, regionIds);
+        }
     }
 }
