@@ -33,7 +33,7 @@ public class ProductCreateRequestDto {
 
     private Long regionId;
 
-    private String category;
+    private Long categoryId;
 
     private ProductStatus status;
 }
