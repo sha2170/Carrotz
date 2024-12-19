@@ -38,13 +38,26 @@ public class CategoryRepository {
     /**
      * 카테고리명을 기준으로 카테고리를 조회합니다.
      * @param categoryName 카테고리명
-     * @return CategoryEntity
+     * @return Optional<CategoryEntity>
      */
-    public CategoryEntity findByName(String categoryName) {
-        return entityManager.createQuery(
+    public Optional<CategoryEntity> findByName(String categoryName) {
+        List<CategoryEntity> results = entityManager.createQuery(
                         "SELECT c FROM CategoryEntity c WHERE c.name = :categoryName", CategoryEntity.class)
                 .setParameter("categoryName", categoryName)
-                .getSingleResult();
+                .getResultList();
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+    }
+
+    /**
+     * 여러 카테고리 이름을 기준으로 카테고리를 조회합니다.
+     * @param categoryNames 카테고리 이름 목록
+     * @return 카테고리 엔티티 목록
+     */
+    public List<CategoryEntity> findByNames(List<String> categoryNames) {
+        return entityManager.createQuery(
+                        "SELECT c FROM CategoryEntity c WHERE c.name IN :categoryNames", CategoryEntity.class)
+                .setParameter("categoryNames", categoryNames)
+                .getResultList();
     }
 
     /**
