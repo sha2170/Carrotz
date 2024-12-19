@@ -101,4 +101,3 @@ public class ProductEntity {
         this.updatedAt = LocalDateTime.now();
     }
 }
-}

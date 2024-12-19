@@ -9,8 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserSessionInfo {
 
-    // 세션에 저장할 사용자 정보
     private Long id;
     private String loginId;
     private String email;
+    private String phone;
+    private String profileImageUrl;
+    private String regionName;
 }

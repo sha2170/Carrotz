@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserLoginRequest {
 
-    // 로그인 시 입력받을 데이터
     @NotNull
     private String loginId;
 

@@ -1,11 +1,11 @@
 package com.carrotzmarket.api.domain.user.session;
 
 import com.carrotzmarket.api.common.api.Api;
-import com.carrotzmarket.api.domain.user.business.UserBusiness;
 import com.carrotzmarket.api.domain.user.controller.UserOpenApiController;
 import com.carrotzmarket.api.domain.user.controller.model.UserLoginRequest;
 import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
 import com.carrotzmarket.api.domain.user.controller.model.UserSessionInfo;
+import com.carrotzmarket.api.domain.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ public class UserOpenApiControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private UserBusiness userBusiness;
+    private UserService userService;
 
     @InjectMocks
     private UserOpenApiController userOpenApiController; // Mock 객체를 주입받을 컨트롤러
@@ -51,7 +51,7 @@ public class UserOpenApiControllerTest {
         response.setEmail("test@gmail.com");
 
         // Mock의 반환값 설정
-        given(userBusiness.login(request)).willReturn(Api.OK(response));
+        given(userService.login(request)).willReturn(Api.OK(response));
 
         // WHEN: 로그인 요청 실행
         mockMvc.perform(post("/open-api/user/login")
@@ -59,7 +59,7 @@ public class UserOpenApiControllerTest {
                         .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(request().sessionAttribute("userSession",
-                        new UserSessionInfo(null, "test", "test@gmail.com"))) // 세션 검증
+                        new UserSessionInfo(null, "test", "test@gmail.com","010-1111-1111", "asdasdasd", "aaaa" ))) // 세션 검증
                 .andExpect(jsonPath("$.data.loginId").value("test"));
     }
 
@@ -72,7 +72,7 @@ public class UserOpenApiControllerTest {
         response.setEmail("testUser@gmail.com");
 
         // Mock의 반환값 설정
-        given(userBusiness.login(request)).willReturn(Api.OK(response));
+        given(userService.login(request)).willReturn(Api.OK(response));
 
         // MockHttpSession 객체 생성
         MockHttpSession session = new MockHttpSession();
