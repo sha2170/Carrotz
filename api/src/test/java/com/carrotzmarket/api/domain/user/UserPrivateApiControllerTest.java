@@ -1,42 +1,130 @@
 package com.carrotzmarket.api.domain.user;
 
-import com.carrotzmarket.api.domain.user.controller.model.UserUpdateRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.carrotzmarket.api.common.api.Api;
+import com.carrotzmarket.api.common.error.ErrorCodeInterface;
+import com.carrotzmarket.api.common.exception.ApiException;
+import com.carrotzmarket.api.domain.user.business.UserBusiness;
+import com.carrotzmarket.api.domain.user.controller.model.UserLoginRequest;
+import com.carrotzmarket.api.domain.user.controller.model.UserRegisterRequest;
+import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
+import com.carrotzmarket.api.domain.user.converter.UserConverter;
+import com.carrotzmarket.api.domain.user.service.UserService;
+import com.carrotzmarket.db.region.RegionEntity;
+import com.carrotzmarket.db.user.UserEntity;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import java.time.LocalDate;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 public class UserPrivateApiControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Mock
+    private UserService userService;
 
-    @Test
-    public void updateUserTest() throws Exception {
-        UserUpdateRequest request = new UserUpdateRequest("newPassword", "newImage.jpg", "newEmail@example.com", "010-1234-5678", 1L);
+    @Mock
+    private UserConverter userConverter;
 
-        mockMvc.perform(put("/private-api/user/update")
-                        .param("loginId", "userLogin123")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(request)))
-                .andExpect(status().isOk());
+    @InjectMocks
+    private UserBusiness userBusiness;
+
+    private UserRegisterRequest registerRequest;
+    private UserEntity userEntity;
+    private UserResponse userResponse;
+    private RegionEntity regionEntity;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+        // Create a mock region entity
+        regionEntity = RegionEntity.builder()
+                .id(1L)
+                .name("Test Region")
+                .build();
+
+        registerRequest = new UserRegisterRequest(
+                "testuser",
+                "password",
+                "test@example.com",
+                "010-1234-5678",
+                LocalDate.of(1990, 1, 1),
+                null,  // profileImageUrl
+                1L     // regionId
+        );
+
+        userEntity = UserEntity.builder()
+                .loginid("testuser")
+                .password("password")
+                .email("test@example.com")
+                .build();
+
+        userResponse = UserResponse.builder()
+                .loginId("testuser")
+                .email("test@example.com")
+                .regionName("Test Region") // Include region name in the response
+                .build();
     }
 
     @Test
-    public void deleteUserTest() throws Exception {
-        mockMvc.perform(delete("/private-api/user/delete")
-                        .param("userId", "1"))
-                .andExpect(status().isOk());
+    void 사용자_등록_성공() {
+        when(userConverter.toEntity(registerRequest)).thenReturn(userEntity);
+        when(userConverter.toResponse(userEntity)).thenReturn(userResponse);
+
+        doNothing().when(userService).register(userEntity);
+
+        Api<UserResponse> response = userBusiness.register(registerRequest);
+
+        assertNotNull(response);
+        assertEquals("testuser", response.getData().getLoginId());
+        assertEquals("Test Region", response.getData().getRegionName());
+        verify(userService, times(1)).register(userEntity);
+    }
+
+    @Test
+    void 사용자_등록_실패_중복된_ID() {
+        ErrorCodeInterface mockErrorCode = mock(ErrorCodeInterface.class);
+        when(mockErrorCode.getDescription()).thenReturn("이미 존재하는 로그인 ID");
+
+        when(userConverter.toEntity(registerRequest)).thenReturn(userEntity);
+
+        doThrow(new ApiException(mockErrorCode))
+                .when(userService).register(any(UserEntity.class));
+
+        ApiException exception = assertThrows(ApiException.class, () -> userBusiness.register(registerRequest));
+        assertEquals("이미 존재하는 로그인 ID", exception.getMessage());
+    }
+
+    @Test
+    void 사용자_로그인_성공() {
+        UserLoginRequest loginRequest = new UserLoginRequest("testuser", "password");
+        when(userService.login("testuser", "password")).thenReturn(userEntity);
+        when(userConverter.toResponse(userEntity)).thenReturn(userResponse);
+
+        Api<UserResponse> response = userBusiness.login(loginRequest);
+
+        assertNotNull(response);
+        assertEquals("testuser", response.getData().getLoginId());
+        assertEquals("Test Region", response.getData().getRegionName());
+    }
+
+    @Test
+    void 사용자_정보_조회_성공() {
+        when(userService.findById(1L)).thenReturn(userEntity);
+        when(userConverter.toResponse(userEntity)).thenReturn(userResponse);
+
+        UserResponse response = userBusiness.getUserInfo(1L);
+
+        assertNotNull(response);
+        assertEquals("testuser", response.getLoginId());
+        assertEquals("Test Region", response.getRegionName());
     }
 }
-
