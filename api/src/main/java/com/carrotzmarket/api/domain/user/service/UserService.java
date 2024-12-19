@@ -1,15 +1,23 @@
 package com.carrotzmarket.api.domain.user.service;
 
+import com.carrotzmarket.api.common.api.Api;
 import com.carrotzmarket.api.common.error.RegionErrorCode;
 import com.carrotzmarket.api.common.error.UserErrorCode;
 import com.carrotzmarket.api.common.exception.ApiException;
+import com.carrotzmarket.api.domain.user.controller.model.UserLoginRequest;
+import com.carrotzmarket.api.domain.user.controller.model.UserRegisterRequest;
+import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
+import com.carrotzmarket.api.domain.user.controller.model.UserUpdateRequest;
+import com.carrotzmarket.api.domain.user.converter.UserConverter;
 import com.carrotzmarket.api.domain.user.repository.UserRepository;
 import com.carrotzmarket.db.region.RegionEntity;
 import com.carrotzmarket.db.user.UserEntity;
+import com.carrotzmarket.db.user.UserRegionEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -18,64 +26,74 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserConverter userConverter;
 
-    /**
-     * 사용자 등록
-     * @param user 등록할 사용자 엔티티
-     */
-    public void register(UserEntity user) {
-        // 이미 존재하는 로그인 ID인지 확인
-        userRepository.findByLoginId(user.getLoginid())
+
+    public Api<UserResponse> register(UserRegisterRequest request){
+
+        UserEntity userEntity = userConverter.toEntity(request);
+        userEntity.setCreatedAt(LocalDateTime.now());
+
+        userRepository.findByLoginId(userEntity.getLoginid())
                 .ifPresent(existingUser -> {
-                    throw new ApiException(UserErrorCode.USER_NOT_FOUND, "이미 존재하는 로그인 ID입니다.");
+                    throw new ApiException(UserErrorCode.USER_ALREADY_EXIST, "이미 존재하는 로그인 아이디 입니다.");
                 });
 
-        // 사용자 저장
-        userRepository.save(user);
+        userRepository.save(userEntity);
+
+        UserResponse response = userConverter.toResponse(userEntity);
+        return Api.OK(response);
     }
 
-    /**
-     * 사용자 로그인
-     * @param loginId 사용자 로그인 ID
-     * @param password 사용자 비밀번호
-     * @return 인증된 사용자 엔티티
-     */
-    public UserEntity login(String loginId, String password) {
-        // 로그인 ID로 사용자 조회
-        return userRepository.findByLoginId(loginId)
-                .filter(user -> user.getPassword().equals(password)) // 비밀번호 확인
-                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "로그인 정보가 잘못되었습니다."));
+
+    public Api<UserResponse> login(UserLoginRequest request) {
+        UserEntity userEntity = userRepository.findByLoginId(request.getLoginId())
+                .filter(user -> user.getPassword().equals(request.getPassword()))
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "절못된 로그인 정보"));
+
+        UserResponse response = userConverter.toResponse(userEntity);
+        return Api.OK(response);
     }
 
-    /**
-     * 사용자 조회
-     * @param userId 조회할 사용자 ID
-     * @return 사용자 엔티티
-     */
-    public UserEntity findById(Long userId) {
-        // 사용자 ID로 조회
-        return userRepository.findById(userId) // ID를 문자열로 변환 후 조회
-                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "해당 ID의 사용자를 찾을 수 없습니다."));
+
+    public UserResponse getUserInfo(String loginId) {
+        UserEntity userEntity = userRepository.findByLoginId(loginId)
+                .orElseThrow(()-> new ApiException(UserErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
+
+        return userConverter.toResponse(userEntity);
     }
 
-    /**
-     * 모든 사용자 조회
-     * @return 모든 사용자 엔티티 목록
-     */
-    public Iterable<UserEntity> findAllUsers() {
-        return userRepository.findAll();
+
+    public UserResponse updateUser(String loginId, UserUpdateRequest request) {
+        UserEntity userEntity = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
+
+        Optional.ofNullable(request.getEmail()).ifPresent(userEntity::setEmail);
+        Optional.ofNullable(request.getPhone()).ifPresent(userEntity::setPhone);
+        Optional.ofNullable(request.getPassword()).ifPresent(userEntity::setPassword);
+        Optional.ofNullable(request.getProfileImageUrl()).ifPresent(userEntity::setProfile_iamge_url);
+
+        if(request.getRegionId() != null){
+            RegionEntity region = userRepository.findRegionById(request.getRegionId())
+                    .orElseThrow(() -> new ApiException(RegionErrorCode.REGION_NOT_FOUND, "해당 지역을 찾지 못했습니다."));
+            userEntity.getUserRegions().clear();
+            userEntity.getUserRegions().add(UserRegionEntity.builder().user(userEntity).region(region).build());
+        }
+
+        userRepository.save(userEntity);
+        return userConverter.toResponse(userEntity);
     }
 
-    /**
-     * 사용자 삭제
-     * @param loginId 삭제할 사용자 ID
-     */
+
     public void deleteUser(String loginId) {
-        userRepository.findByLoginId(loginId)
+        UserEntity userEntity = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, " 삭제 대상이 없습니다."));
 
+        // 지역도 같이 삭제해줘야 유저가 삭제됨
+        userRepository.deleteUserRegionsByUserId(userEntity.getId());
         userRepository.deleteByLoginId(loginId);
     }
+
 
     // 사용자 정보 업데이트용 save 메서드
     public void save(UserEntity user){
@@ -90,5 +108,10 @@ public class UserService {
     public UserEntity findByLoginId(String loginId) {
         return userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "해당 로그인 ID의 사용자를 찾을 수 없습니다."));
+    }
+
+    public UserEntity findById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "해당 ID의 사용자를 찾을 수 없습니다."));
     }
 }
