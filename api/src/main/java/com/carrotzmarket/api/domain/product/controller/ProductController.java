@@ -121,4 +121,44 @@ public class ProductController {
         return productService.getProductByCategory(categoryName);
     }
 
+    // 가격 범위로 상품 필터링
+    @GetMapping
+    public List<ProductEntity> getFilteredProducts(
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice
+    ) {
+        return productService.getProductsByPriceRange(minPrice, maxPrice);
+    }
+
+    // 정렬 범위로 상품 필터링
+    @GetMapping("/sort")
+    public List<ProductEntity> getSortedProducts(
+            @RequestParam String sortBy,
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice
+    ) {
+        return productService.getProductsSortedBy(sortBy, minPrice, maxPrice);
+    }
+
+    // 카테고리 범위로 상품 필터링
+    @GetMapping("/category/filter")
+    public List<ProductEntity> getProductsByCategory(
+            @RequestParam Long categoryId,
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) String sortBy
+    ) {
+        return productService.getProductsByCategory(categoryId, minPrice, maxPrice, sortBy);
+    }
+
+    // 지역 기반 상품 필터링
+    @GetMapping("/region/filter")
+    public List<ProductEntity> getProductsByRegion(
+            @RequestParam Long regionId,
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) String sortBy
+    ) {
+        return productService.getProductsByRegion(regionId, minPrice, maxPrice, sortBy);
+    }
 }
