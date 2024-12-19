@@ -100,6 +100,13 @@ public class UserService {
         userRepository.save(user);
     }
 
+
+
+
+
+
+
+
     public RegionEntity findRegionById(Long regionId){
         return userRepository.findRegionById(regionId)
                 .orElseThrow(() -> new ApiException(RegionErrorCode.REGION_NOT_FOUND,"해당 지역을 찾을 수 없음"));
