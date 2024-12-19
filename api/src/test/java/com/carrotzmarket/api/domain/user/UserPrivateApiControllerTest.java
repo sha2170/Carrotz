@@ -11,7 +11,6 @@ import com.carrotzmarket.api.domain.user.converter.UserConverter;
 import com.carrotzmarket.api.domain.user.service.UserService;
 import com.carrotzmarket.db.region.RegionEntity;
 import com.carrotzmarket.db.user.UserEntity;
-import com.carrotzmarket.db.user.UserRegionEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,13 +20,12 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+public class UserPrivateApiControllerTest {
 
     @Mock
     private UserService userService;
@@ -53,7 +51,6 @@ public class UserServiceTest {
                 .name("Test Region")
                 .build();
 
-        // Create a mock user entity
         registerRequest = new UserRegisterRequest(
                 "testuser",
                 "password",
@@ -68,26 +65,14 @@ public class UserServiceTest {
                 .loginid("testuser")
                 .password("password")
                 .email("test@example.com")
-                .userRegions(new ArrayList<>())
                 .build();
 
-        // Create a mock user-region entity
-        UserRegionEntity userRegionEntity = UserRegionEntity.builder()
-                .user(userEntity)
-                .region(regionEntity)
-                .build();
-
-        // Add the userRegionEntity to the userEntity's regions
-        userEntity.getUserRegions().add(userRegionEntity);
-
-        // Create a mock user response
         userResponse = UserResponse.builder()
                 .loginId("testuser")
                 .email("test@example.com")
                 .regionName("Test Region") // Include region name in the response
                 .build();
     }
-
 
     @Test
     void 사용자_등록_성공() {

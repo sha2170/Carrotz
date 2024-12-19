@@ -55,6 +55,11 @@ public class UserConverter {
 
     // Entity -> DTO 변환
     public UserResponse toResponse(UserEntity userEntity) {
+        // 지역의 첫 번째 값만 가져오기
+        String regionName = userEntity.getUserRegions() != null && !userEntity.getUserRegions().isEmpty()
+                ? userEntity.getUserRegions().get(0).getRegion().getName()
+                : null;
+
         return UserResponse.builder()
                 .loginId(userEntity.getLoginid())
                 .email(userEntity.getEmail())

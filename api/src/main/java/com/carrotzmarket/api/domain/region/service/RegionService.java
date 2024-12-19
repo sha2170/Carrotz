@@ -30,7 +30,6 @@ public class RegionService {
     }
 
     // 새로운 지역 추가
-    @Transactional
     public RegionEntity addRegion(String name, Long parentId) {
         RegionEntity parentRegion = null;
         if (parentId != null) {
