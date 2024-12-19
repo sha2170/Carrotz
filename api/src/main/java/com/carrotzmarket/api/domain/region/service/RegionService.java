@@ -8,7 +8,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,6 +30,7 @@ public class RegionService {
     }
 
     // 새로운 지역 추가
+    @Transactional
     public RegionEntity addRegion(String name, Long parentId) {
         RegionEntity parentRegion = null;
         if (parentId != null) {
@@ -49,6 +49,7 @@ public class RegionService {
     public List<RegionEntity> findAllRegions() {
         return regionRepository.findAll();
     }
+
 
     // 특정 지역 및 하위 지역에 포함된 지역 ID 목록 반환
     public List<Long> getRegionHierarchy(Long regionId) {

@@ -11,8 +11,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,6 +32,7 @@ public class ProductCreateRequestDto {
     private Long userId;
 
     private Long regionId;
+
 
     private List<String> categories;
     private Long categoryId;

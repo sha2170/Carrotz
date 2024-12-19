@@ -1,5 +1,9 @@
 package com.carrotzmarket.api.domain.region.repository;
 
+import com.carrotzmarket.db.region.RegionEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
 import com.carrotzmarket.api.common.error.RegionErrorCode;
 import com.carrotzmarket.api.common.exception.ApiException;
 import com.carrotzmarket.db.region.RegionEntity;
@@ -64,4 +68,3 @@ public class RegionRepository {
                 .getResultList();
     }
 }
-

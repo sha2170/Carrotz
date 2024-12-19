@@ -61,3 +61,4 @@ public class UserPrivateApiController {
         return Api.OK("유저의 계정이 삭제되었습니다.");
     }
 }
+}

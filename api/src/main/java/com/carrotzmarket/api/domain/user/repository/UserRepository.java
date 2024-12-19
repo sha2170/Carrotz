@@ -54,10 +54,7 @@ public class UserRepository{
                 .setParameter("loginId", loginId)
                 .getSingleResult();
 
-        // user_region 데이터 삭제
         deleteUserRegionsByUserId(user.getId());
-
-        // users 데이터 삭제
         em.remove(user);
     }
 
@@ -86,4 +83,5 @@ public class UserRepository{
         RegionEntity region = em.find(RegionEntity.class, regionid);
         return Optional.ofNullable(region);
     }
+}
 }

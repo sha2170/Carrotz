@@ -9,6 +9,7 @@ import com.carrotzmarket.api.domain.user.controller.model.UserRegisterRequest;
 import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
 import com.carrotzmarket.api.domain.user.converter.UserConverter;
 import com.carrotzmarket.api.domain.user.service.UserService;
+
 import com.carrotzmarket.db.region.RegionEntity;
 import com.carrotzmarket.db.user.UserEntity;
 import com.carrotzmarket.db.user.UserRegionEntity;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
 
@@ -42,11 +44,12 @@ public class UserServiceTest {
     private UserEntity userEntity;
     private UserResponse userResponse;
     private RegionEntity regionEntity;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
+
+        registerRequest = new UserRegisterRequest("testuser", "password", "test@example.com", "010-1234-5678", LocalDate.of(1990, 1, 1), null);
         // Create a mock region entity
         regionEntity = RegionEntity.builder()
                 .id(1L)
@@ -68,6 +71,13 @@ public class UserServiceTest {
                 .loginid("testuser")
                 .password("password")
                 .email("test@example.com")
+                .build();
+        userResponse = UserResponse.builder()
+                .loginId("testuser")
+                .email("test@example.com")
+                .build();
+    }
+
                 .userRegions(new ArrayList<>())
                 .build();
 
@@ -93,7 +103,6 @@ public class UserServiceTest {
     void 사용자_등록_성공() {
         when(userConverter.toEntity(registerRequest)).thenReturn(userEntity);
         when(userConverter.toResponse(userEntity)).thenReturn(userResponse);
-
         doNothing().when(userService).register(userEntity);
 
         Api<UserResponse> response = userBusiness.register(registerRequest);
@@ -106,6 +115,11 @@ public class UserServiceTest {
 
     @Test
     void 사용자_등록_실패_중복된_ID() {
+        // Given
+        ErrorCodeInterface mockErrorCode = mock(ErrorCodeInterface.class);
+        when(mockErrorCode.getDescription()).thenReturn("이미 존재하는 로그인 ID");
+
+        // `userConverter.toEntity`가 null이 아닌 객체를 반환하도록 Mock 설정
         ErrorCodeInterface mockErrorCode = mock(ErrorCodeInterface.class);
         when(mockErrorCode.getDescription()).thenReturn("이미 존재하는 로그인 ID");
 
@@ -114,6 +128,7 @@ public class UserServiceTest {
         doThrow(new ApiException(mockErrorCode))
                 .when(userService).register(any(UserEntity.class));
 
+        // When & Then
         ApiException exception = assertThrows(ApiException.class, () -> userBusiness.register(registerRequest));
         assertEquals("이미 존재하는 로그인 ID", exception.getMessage());
     }

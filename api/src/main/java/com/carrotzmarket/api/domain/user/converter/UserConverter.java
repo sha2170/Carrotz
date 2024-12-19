@@ -8,6 +8,7 @@ import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
 import com.carrotzmarket.db.region.RegionEntity;
 import com.carrotzmarket.db.user.UserEntity;
 import com.carrotzmarket.db.user.UserRegionEntity;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +37,7 @@ public class UserConverter {
                 .phone(request.getPhone())
                 .birthday(request.getBirthday() != null ? (request.getBirthday()) : null)
                 .profile_iamge_url(request.getProfileImageUrl())
+                .createdAt(LocalDateTime.now())
                 .build();
 
 
@@ -52,6 +54,8 @@ public class UserConverter {
 
         return userEntity;
     }
+    // Entity -> DTO 변환
+    public UserResponse toResponse(UserEntity userEntity) {
 
     // Entity -> DTO 변환
     public UserResponse toResponse(UserEntity userEntity) {
