@@ -46,7 +46,6 @@ public class UserConverter {
                 .region(region)
                 .build();
 
-        // 지역이 null인지 확인하고 초기화
         if (userEntity.getUserRegions() == null) {
             userEntity.setUserRegions(new ArrayList<>());
         }
@@ -71,7 +70,7 @@ public class UserConverter {
                 .createdAt(userEntity.getCreatedAt())
                 .lastLoginAt(userEntity.getLastLoginAt())
                 .isDeleted(userEntity.isDeleted())
-                .regionName(userEntity.getUserRegions() != null && !userEntity.getUserRegions().isEmpty() ? userEntity.getUserRegions().get(0).getRegion().getName() : null).
-                build();
+                .regionName(userEntity.getUserRegions() != null && !userEntity.getUserRegions().isEmpty() ? userEntity.getUserRegions().get(0).getRegion().getName() : null)
+                .build();
     }
 }
