@@ -19,34 +19,20 @@ public class RegionController {
 
     private final RegionService regionService;
 
-    /**
-     * 모든 지역 조회
-     * @return 지역 계층 구조
-     */
     @GetMapping
     public ResponseEntity<List<RegionEntity>> getAllRegions() {
         return ResponseEntity.ok(regionService.findAllRegions());
     }
 
-    /**
-     * 특정 지역 및 하위 지역 ID 목록 조회
-     * @param regionId 조회할 지역 ID
-     * @return 지역 ID 목록
-     */
     @GetMapping("/{id}/hierarchy")
     public ResponseEntity<List<Long>> getRegionHierarchy(@PathVariable("regionId") Long regionId) {
         return ResponseEntity.ok(regionService.getRegionHierarchy(regionId));
     }
 
-    /**
-     * 사용자에 지역 추가
-     * @param userId 사용자 ID
-     * @param regionId 지역 ID
-     * @return 성공 메시지
-     */
-    @PostMapping("/user")
-    public ResponseEntity<String> addUserRegion(@RequestParam Long userId, @RequestParam Long regionId) {
-        regionService.addUserRegion(userId, regionId);
-        return ResponseEntity.ok("Region added to user successfully.");
-    }
+//    @PostMapping("/user")
+//    public ResponseEntity<String> addUserRegion(@RequestParam Long userId, @RequestParam Long regionId) {
+//        regionService.addUserRegion(userId, regionId);
+//        return ResponseEntity.ok("Region added to user successfully.");
+//    }
+
 }
