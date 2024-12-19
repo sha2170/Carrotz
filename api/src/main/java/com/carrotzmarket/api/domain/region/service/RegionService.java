@@ -18,19 +18,16 @@ public class RegionService {
 
     private final RegionRepository regionRepository;
 
-    // ID로 지역 조회
     public RegionEntity findById(Long id) {
         return regionRepository.findById(id)
                 .orElseThrow(() -> new ApiException(RegionErrorCode.INVALID_REGION, "유효하지 않은 지역 ID입니다."));
     }
 
-    // 이름으로 지역 조회
     public RegionEntity findByName(String name) {
         return regionRepository.findByName(name)
                 .orElseThrow(() -> new ApiException(RegionErrorCode.INVALID_REGION, "지역 이름이 유효하지 않습니다."));
     }
 
-    // 새로운 지역 추가
     @Transactional
     public RegionEntity addRegion(String name, Long parentId) {
         RegionEntity parentRegion = null;
@@ -46,13 +43,10 @@ public class RegionService {
         return regionRepository.save(region);
     }
 
-    // 모든 지역 조회
     public List<RegionEntity> findAllRegions() {
         return regionRepository.findAll();
     }
 
-
-    // 특정 지역 및 하위 지역에 포함된 지역 ID 목록 반환
     public List<Long> getRegionHierarchy(Long regionId) {
         RegionEntity region = findById(regionId);
         if (region == null) {

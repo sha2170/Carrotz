@@ -45,7 +45,6 @@ public class UserService {
         return Api.OK(response);
     }
 
-
     public Api<UserResponse> login(UserLoginRequest request) {
         UserEntity userEntity = userRepository.findByLoginId(request.getLoginId())
                 .filter(user -> user.getPassword().equals(request.getPassword()))
@@ -55,14 +54,12 @@ public class UserService {
         return Api.OK(response);
     }
 
-
     public UserResponse getUserInfo(String loginId) {
         UserEntity userEntity = userRepository.findByLoginId(loginId)
                 .orElseThrow(()-> new ApiException(UserErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
         return userConverter.toResponse(userEntity);
     }
-
 
     public UserResponse updateUser(String loginId, UserUpdateRequest request) {
         UserEntity userEntity = userRepository.findByLoginId(loginId)
@@ -94,18 +91,10 @@ public class UserService {
         userRepository.deleteByLoginId(loginId);
     }
 
-
     // 사용자 정보 업데이트용 save 메서드
     public void save(UserEntity user){
         userRepository.save(user);
     }
-
-
-
-
-
-
-
 
     public RegionEntity findRegionById(Long regionId){
         return userRepository.findRegionById(regionId)
