@@ -1,10 +1,12 @@
 package com.carrotzmarket.api.domain.user.controller.model;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -12,14 +14,22 @@ import lombok.NoArgsConstructor;
 public class UserRegisterRequest {
 
     // 회원 가입 시 받아올 데이터 목록
-    @NotNull
+    @NotBlank
     private String loginId;
 
-    @NotNull
+    @NotBlank
     private String password;
 
-    @NotNull
+    @NotBlank
     @Email
     private String email;
+
+    private String phone;
+
+    private LocalDate birthday;
+
+    private String profileImageUrl;
+
+    private Long regionId; // 지역의 ID를 입력하게 설정
 
 }

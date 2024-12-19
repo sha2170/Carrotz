@@ -1,7 +1,5 @@
 package com.carrotzmarket.api.common.api;
 
-import com.carrotzmarket.api.common.error.ErrorCodeInterface;
-import com.carrotzmarket.api.common.error.ErrorCodeInterface;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,39 +11,17 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Result {
 
-    private Integer resultCode; // 응답 코드
-    private String resultMessage; // 응답 메시지
-    private String resultDescription; // 응답 설명
+    private boolean success; // 성공 or 실패 여부
+    private String code;      // 응답 코드 ("OK", "ERROR" 등)
+    private String message; // 결과
 
+    // 성공
     public static Result OK() {
-        return Result.builder()
-                .resultCode(200)
-                .resultMessage("OK")
-                .resultDescription("성공")
-                .build();
+        return new Result(true, "OK", "Success");
     }
 
-    public static Result ERROR(ErrorCodeInterface errorCodeInterface) {
-        return Result.builder()
-                .resultCode(errorCodeInterface.getErrorCode())
-                .resultMessage(errorCodeInterface.getDescription())
-                .resultDescription("오류")
-                .build();
-    }
-
-    public static Result ERROR(ErrorCodeInterface errorCodeInterface, Throwable tx) {
-        return Result.builder()
-                .resultCode(errorCodeInterface.getErrorCode())
-                .resultMessage(errorCodeInterface.getDescription())
-                .resultDescription(tx.getLocalizedMessage())
-                .build();
-    }
-
-    public static Result ERROR(ErrorCodeInterface errorCodeInterface, String description) {
-        return Result.builder()
-                .resultCode(errorCodeInterface.getErrorCode())
-                .resultMessage(errorCodeInterface.getDescription())
-                .resultDescription(description)
-                .build();
+    // 실패
+    public static Result ERROR(String message) {
+        return new Result(false, "ERROR", message);
     }
 }

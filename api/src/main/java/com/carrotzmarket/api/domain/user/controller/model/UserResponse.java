@@ -16,6 +16,8 @@ public class UserResponse {
 
     // 유저에게 반환될 데이터
     // password는 민감정보이기 때문에 반환하지 않는다.
+    private Long id;
+
     private String loginId;
 
     private String email;
@@ -27,6 +29,8 @@ public class UserResponse {
     private String profileImageUrl;
 
     private boolean isDeleted;
+
+    private String regionName;
 
     private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
