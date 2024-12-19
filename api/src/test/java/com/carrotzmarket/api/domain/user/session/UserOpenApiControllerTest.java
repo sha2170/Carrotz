@@ -1,7 +1,6 @@
 package com.carrotzmarket.api.domain.user.session;
 
 import com.carrotzmarket.api.common.api.Api;
-import com.carrotzmarket.api.domain.user.business.UserBusiness;
 import com.carrotzmarket.api.domain.user.controller.UserOpenApiController;
 import com.carrotzmarket.api.domain.user.controller.model.UserLoginRequest;
 import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
@@ -60,7 +59,7 @@ public class UserOpenApiControllerTest {
                         .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(request().sessionAttribute("userSession",
-                        new UserSessionInfo(null, "test", "test@gmail.com"))) // 세션 검증
+                        new UserSessionInfo(null, "test", "test@gmail.com","010-1111-1111", "asdasdasd", "aaaa" ))) // 세션 검증
                 .andExpect(jsonPath("$.data.loginId").value("test"));
     }
 
