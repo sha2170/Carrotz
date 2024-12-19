@@ -52,7 +52,8 @@ public class ProductTransactionService {
     public ProductTransactionEntity updateTransaction(TransactionStatusUpdateRequest request) {
 
         // 거래 상태 변경을 요청하는 사용자가 판매자인지 확인
-        ProductEntity product = productService.getProductById(request.getProductId());
+        ProductEntity product = productService.findProductById(request.getProductId());
+
         validateSellerAuthorization(product, request.getAuthorId());
 
         // 상품의 ID와 판매자의 ID로 거래내역을 조회

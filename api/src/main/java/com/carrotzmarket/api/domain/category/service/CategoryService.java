@@ -39,10 +39,11 @@ public class CategoryService {
      * @return 카테고리 정보
      */
     public CategoryDto getCategoryWithSubcategories(Long id) {
-        CategoryEntity category = categoryRepository.findById(id);
-        if (category == null) {
-            throw new NoSuchElementException("Category with ID " + id + " not found");
+        Optional<CategoryEntity> categoryOptional = categoryRepository.findById(id);
+        if (categoryOptional.isEmpty()) {
+            throw new IllegalArgumentException("Category not found with ID: " + id);
         }
+        CategoryEntity category = categoryOptional.get();
         return convertToDto(category);
     }
 

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class CategoryRepository {
@@ -30,8 +31,8 @@ public class CategoryRepository {
      * @param id 조회할 카테고리의 ID
      * @return CategoryEntity
      */
-    public CategoryEntity findById(Long id) {
-        return entityManager.find(CategoryEntity.class, id);
+    public Optional<CategoryEntity> findById(Long id) {
+        return Optional.ofNullable(entityManager.find(CategoryEntity.class, id));
     }
 
     /**

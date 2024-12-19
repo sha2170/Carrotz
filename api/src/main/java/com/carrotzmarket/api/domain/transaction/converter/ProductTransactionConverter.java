@@ -20,7 +20,7 @@ public class ProductTransactionConverter {
                     return ProductTransactionEntity.builder()
                             .buyerId(request.getBuyerId())
                             .sellerId(request.getSellerId())
-                            .product(productService.getProductById(request.getProductId()))
+                            .product(productService.findProductById(request.getProductId()))
                             .transactionDate(request.getTransactionDate())
                             .tradingHours(request.getTradingHours())
                             .tradingPlace(request.getTradingPlace())

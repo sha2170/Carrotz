@@ -1,6 +1,7 @@
 package com.carrotzmarket.api.domain.product.controller;
 
 import com.carrotzmarket.api.domain.product.dto.ProductCreateRequestDto;
+import com.carrotzmarket.api.domain.product.dto.ProductResponseDto;
 import com.carrotzmarket.api.domain.product.service.ProductService;
 import com.carrotzmarket.db.product.ProductEntity;
 import jakarta.validation.Valid;
@@ -32,9 +33,9 @@ public class ProductController {
 
     // 제품 조회
     @GetMapping("/{id}")
-    public ResponseEntity<ProductEntity> getProductById(@PathVariable("id") Long id) {
-        ProductEntity product = productService.getProductById(id);
-        return ResponseEntity.ok(product);
+    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long id) {
+        ProductResponseDto response = productService.getProductById(id);
+        return ResponseEntity.ok(response);
     }
 
     // 유효성 검사 실패 시 오류 응답 반환
