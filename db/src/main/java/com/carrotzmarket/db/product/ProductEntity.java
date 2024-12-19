@@ -3,6 +3,7 @@ package com.carrotzmarket.db.product;
 import com.carrotzmarket.db.category.CategoryEntity;
 import com.carrotzmarket.db.transaction.ProductTransactionEntity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import jakarta.persistence.CascadeType;
@@ -56,6 +57,7 @@ public class ProductEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private CategoryEntity category;
 
 
@@ -85,6 +87,17 @@ public class ProductEntity {
             joinColumns = @JoinColumn(name = "product_id"),  // 제품 ID
             inverseJoinColumns = @JoinColumn(name = "category_id")  // 카테고리 ID
     )
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<CategoryEntity> categories;  // 여러 카테고리를 저장
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }
