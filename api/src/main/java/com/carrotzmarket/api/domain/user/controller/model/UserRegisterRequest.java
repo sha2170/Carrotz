@@ -30,4 +30,6 @@ public class UserRegisterRequest {
 
     private String profileImageUrl;
 
+    private Long regionId; // 지역의 ID를 입력하게 설정
+
 }

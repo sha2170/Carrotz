@@ -30,6 +30,8 @@ public class UserResponse {
 
     private boolean isDeleted;
 
+    private String regionName;
+
     private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
 

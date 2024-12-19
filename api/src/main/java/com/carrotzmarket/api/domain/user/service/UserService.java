@@ -19,9 +19,6 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    @PersistenceContext
-    private EntityManager em;
-
     /**
      * 사용자 등록
      * @param user 등록할 사용자 엔티티

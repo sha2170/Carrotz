@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.swing.plaf.synth.Region;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -27,6 +28,8 @@ public class User {
     private LocalDate birthday;
 
     private String profileImageUrl;
+
+    private Region region;
 
     private boolean isDeleted;
 
