@@ -77,11 +77,12 @@ public class CategoryRepository {
      * @param category 저장할 카테고리 엔티티
      */
     @Transactional
-    public void save(CategoryEntity category) {
+    public CategoryEntity save(CategoryEntity category) {
         if (category.getId() == null) {
             entityManager.persist(category);
+            return category; // 새로 저장된 엔티티 반환
         } else {
-            entityManager.merge(category);
+            return entityManager.merge(category); // 병합된 엔티티 반환
         }
     }
 
