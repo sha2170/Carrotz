@@ -1,7 +1,6 @@
 package com.carrotzmarket.api.domain.user.repository;
 
 import com.carrotzmarket.api.common.error.RegionErrorCode;
-import com.carrotzmarket.api.common.error.UserErrorCode;
 import com.carrotzmarket.api.common.exception.ApiException;
 import com.carrotzmarket.db.region.RegionEntity;
 import com.carrotzmarket.db.user.UserEntity;
@@ -84,4 +83,4 @@ public class UserRepository{
         return Optional.ofNullable(region);
     }
 }
-}
+
