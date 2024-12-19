@@ -35,11 +35,22 @@ public class ProductService {
                 .price(request.getPrice())
                 .userId(request.getUserId())
                 .regionId(request.getRegionId())
-                .categories(null)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .status(request.getStatus())
                 .build();
+
+        // 카테고리 설정
+        if (request.getCategories() != null && !request.getCategories().isEmpty()) {
+            List<CategoryEntity> categoryEntities = new ArrayList<>();
+            for (String categoryName : request.getCategories()) {
+                CategoryEntity category = categoryRepository.findByName(categoryName)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid category: " + categoryName));
+                categoryEntities.add(category);
+            }
+            product.setCategories(categoryEntities); // 상품에 카테고리 리스트 추가
+        }
+
         // 상품 저장
         return productRepository.save(product);
     }
