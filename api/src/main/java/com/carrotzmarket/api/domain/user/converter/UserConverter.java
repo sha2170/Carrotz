@@ -54,8 +54,6 @@ public class UserConverter {
 
         return userEntity;
     }
-    // Entity -> DTO 변환
-    public UserResponse toResponse(UserEntity userEntity) {
 
     // Entity -> DTO 변환
     public UserResponse toResponse(UserEntity userEntity) {
