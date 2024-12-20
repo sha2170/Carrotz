@@ -5,15 +5,20 @@ import com.carrotzmarket.api.domain.product.dto.ProductResponseDto;
 import com.carrotzmarket.api.domain.product.dto.ProductUpdateRequestDto;
 import com.carrotzmarket.api.domain.product.repository.ProductRepository;
 import com.carrotzmarket.api.domain.category.repository.CategoryRepository;
+import com.carrotzmarket.api.domain.productImage.service.FileUploadService;
+import com.carrotzmarket.api.domain.productImage.service.ProductImageService;
 import com.carrotzmarket.api.domain.region.service.RegionService;
 import com.carrotzmarket.db.category.CategoryEntity;
 import com.carrotzmarket.db.product.ProductEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.carrotzmarket.db.productImage.ProductImageEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Service
@@ -31,6 +37,8 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final RegionService regionService;
+    private final ProductImageService productImageService;
+    private final FileUploadService fileUploadService;
 
     // ProductEntity를 조회하는 메서드
     public ProductEntity findProductById(Long id) {
@@ -50,18 +58,43 @@ public class ProductService {
                 .price(request.getPrice())
                 .userId(request.getUserId())
                 .regionId(request.getRegionId())
-                .category(category) // 카테고리 설정
+                .category(category)
                 .status(request.getStatus())
                 .build();
 
         // 상품 저장
-        return productRepository.save(product);
+        ProductEntity savedProduct = productRepository.save(product);
+
+        if (request.getImages() != null && !request.getImages().isEmpty()) {
+            List<ProductImageEntity> productImages = new ArrayList<>();
+            for (MultipartFile image : request.getImages()) {
+                try {
+                    // 파일 업로드 로직
+                    String imageUrl = fileUploadService.uploadFile(image); // 인스턴스를 통해 호출
+                    ProductImageEntity productImage = new ProductImageEntity();
+                    productImage.setProductId(savedProduct.getId());
+                    productImage.setImageUrl(imageUrl);
+                    productImages.add(productImage);
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to upload image: " + image.getOriginalFilename(), e);
+                }
+            }
+            productImageService.saveAll(productImages);
+        }
+
+        return savedProduct;
     }
+
 
     // 제품 조회
     public ProductResponseDto getProductById(Long id) {
         ProductEntity product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
+
+        List<ProductImageEntity> productImages = productImageService.getProductImageByProductId(id);
+        List<String> imageUrls = productImages.stream()
+                .map(ProductImageEntity::getImageUrl)
+                .collect(Collectors.toList());
 
         return new ProductResponseDto(
                 product.getId(),
@@ -71,7 +104,8 @@ public class ProductService {
                 product.getCategory() != null ? product.getCategory().getId() : null,
                 product.getUserId(),
                 product.getRegionId(),
-                product.getStatus()
+                product.getStatus(),
+                imageUrls
         );
     }
 
@@ -87,6 +121,11 @@ public class ProductService {
         product.setPrice(request.getPrice());
 
         productRepository.save(product); // JPA 변경감지로 저장
+
+        List<String> imageUrls = productImageService.getProductImageByProductId(id).stream()
+                .map(ProductImageEntity::getImageUrl)
+                .collect(Collectors.toList());
+
         return new ProductResponseDto(
                 product.getId(),
                 product.getTitle(),
@@ -95,7 +134,8 @@ public class ProductService {
                 product.getCategory() != null ? product.getCategory().getId() : null,
                 product.getUserId(),
                 product.getRegionId(),
-                product.getStatus()
+                product.getStatus(),
+                imageUrls
         );
     }
 
@@ -116,6 +156,10 @@ public class ProductService {
         product.setStatus(status);
         productRepository.save(product);
 
+        List<String> imageUrls = productImageService.getProductImageByProductId(id).stream()
+                .map(ProductImageEntity::getImageUrl)
+                .collect(Collectors.toList());
+
         return new ProductResponseDto(
                 product.getId(),
                 product.getTitle(),
@@ -124,7 +168,8 @@ public class ProductService {
                 product.getCategory() != null ? product.getCategory().getId() : null,
                 product.getUserId(),
                 product.getRegionId(),
-                product.getStatus()
+                product.getStatus(),
+                imageUrls
         );
     }
 

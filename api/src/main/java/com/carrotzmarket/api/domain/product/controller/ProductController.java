@@ -25,17 +25,19 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @PostMapping
-    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductCreateRequestDto productCreateRequestDto) {
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<?> createProduct(@ModelAttribute ProductCreateRequestDto productCreateRequestDto) {
         ProductEntity product = productService.createProduct(productCreateRequestDto);
-        return ResponseEntity.ok("Product created with ID: " + product);
+        return ResponseEntity.ok("Product created with ID: " + product.getId());
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long id) {
         ProductResponseDto response = productService.getProductById(id);
         return ResponseEntity.ok(response);
     }
+
 
     @PatchMapping("/{id}")
     public ResponseEntity<ProductResponseDto> updateProduct(
