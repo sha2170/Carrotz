@@ -29,7 +29,7 @@ public class UserService {
     private final UserConverter userConverter;
 
 
-    public Api<UserResponse> register(UserRegisterRequest request){
+    public Api<UserResponse> register(UserRegisterRequest request) {
 
         UserEntity userEntity = userConverter.toEntity(request);
         userEntity.setCreatedAt(LocalDateTime.now());
@@ -58,7 +58,7 @@ public class UserService {
 
     public UserResponse getUserInfo(String loginId) {
         UserEntity userEntity = userRepository.findByLoginId(loginId)
-                .orElseThrow(()-> new ApiException(UserErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
         return userConverter.toResponse(userEntity);
     }
@@ -73,7 +73,7 @@ public class UserService {
         Optional.ofNullable(request.getPassword()).ifPresent(userEntity::setPassword);
         Optional.ofNullable(request.getProfileImageUrl()).ifPresent(userEntity::setProfile_iamge_url);
 
-        if(request.getRegionId() != null){
+        if (request.getRegionId() != null) {
             RegionEntity region = userRepository.findRegionById(request.getRegionId())
                     .orElseThrow(() -> new ApiException(RegionErrorCode.REGION_NOT_FOUND, "해당 지역을 찾지 못했습니다."));
             userEntity.getUserRegions().clear();
@@ -89,29 +89,29 @@ public class UserService {
         UserEntity userEntity = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, " 삭제 대상이 없습니다."));
 
-        // 지역도 같이 삭제해줘야 유저가 삭제됨
+        // 유저 삭제 시 지역도 같이 삭제해줘야 유저가 삭제해야 유저가 삭제됨..
         userRepository.deleteUserRegionsByUserId(userEntity.getId());
         userRepository.deleteByLoginId(loginId);
     }
 
 
     // 사용자 정보 업데이트용 save 메서드
-    public void save(UserEntity user){
+    public void save(UserEntity user) {
         userRepository.save(user);
     }
 
-    public RegionEntity findRegionById(Long regionId){
-        return userRepository.findRegionById(regionId)
-                .orElseThrow(() -> new ApiException(RegionErrorCode.REGION_NOT_FOUND,"해당 지역을 찾을 수 없음"));
+
+    public UserResponse findUserByLoginId(String loginId) {
+        UserEntity user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "해당하는 ID는 없습니다."));
+
+        return UserResponse.builder()
+                .loginId(user.getLoginid())
+                .email(user.getEmail())
+                .profileImageUrl(user.getProfile_iamge_url())
+                .region(user.getRegion())
+                .build();
     }
 
-    public UserEntity findByLoginId(String loginId) {
-        return userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "해당 로그인 ID의 사용자를 찾을 수 없습니다."));
-    }
 
-    public UserEntity findById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "해당 ID의 사용자를 찾을 수 없습니다."));
-    }
 }
