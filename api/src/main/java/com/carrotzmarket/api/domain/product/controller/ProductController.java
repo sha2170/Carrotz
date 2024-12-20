@@ -101,10 +101,15 @@ public class ProductController {
     }
 
     @GetMapping("/user/{userId}/favorites")
-    public ResponseEntity<List<ProductResponseDto>> getFavoriteProducts(@PathVariable Long userId) {
+    public ResponseEntity<?> getFavoriteProducts(@PathVariable Long userId) {
         List<ProductResponseDto> favoriteProducts = productService.getFavoriteProductsByUserId(userId);
+
+        if (favoriteProducts.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("관심 상품으로 등록한 상품이 없습니다.");
+        }
         return ResponseEntity.ok(favoriteProducts);
     }
+
 
     @GetMapping("/search")
     public List<ProductEntity> searchProducts(@RequestParam String title) {
