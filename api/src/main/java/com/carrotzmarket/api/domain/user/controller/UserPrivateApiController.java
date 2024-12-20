@@ -50,5 +50,12 @@ public class UserPrivateApiController {
         UserSessionInfo sessionInfo = (UserSessionInfo) session.getAttribute("userSession");
         return Api.OK(sessionInfo);
     }
+
+    @GetMapping("/search")
+    public Api<UserResponse> searchUser(@RequestParam String loginId) {
+        UserResponse response = userService.findUserByLoginId(loginId);
+        return Api.OK(response);
+    }
+
 }
 
