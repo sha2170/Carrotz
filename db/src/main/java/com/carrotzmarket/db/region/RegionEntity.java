@@ -1,6 +1,5 @@
 package com.carrotzmarket.db.region;
 
-import com.carrotzmarket.db.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
