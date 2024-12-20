@@ -21,6 +21,7 @@ public class ProductResponseDto {
     private Long regionId;
     private CategoryDto category;
     private ProductStatus status;
+    private List<String> imageUrls;
 
     public ProductResponseDto(ProductEntity product) {
         this.id = product.getId();
@@ -40,7 +41,10 @@ public class ProductResponseDto {
             );
         }
     }
-    private List<String> imageUrls;
 
-
+    public ProductResponseDto(ProductEntity product, List<String> imageUrls) {
+        this(product);
+        this.imageUrls = imageUrls;
+    }
 }
+
