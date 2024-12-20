@@ -9,12 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * CategoryController는 클라이언트의 요청을 처리하고 응답을 반환하는 역할을 합니다.
- * - 카테고리의 계층 구조 조회
- * - 특정 카테고리 조회
- * - 키워드 기반 검색 기능 제공
- */
 @RestController
 @RequestMapping("/api/categories")
 public class CategoryController {
@@ -32,12 +26,14 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryDto> getCategoryWithSubcategories(@PathVariable Long id) {
-        return ResponseEntity.ok(categoryService.getCategoryWithSubcategories(id));
+    public ResponseEntity<CategoryDto> getCategory(@PathVariable Long id) {
+        return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<CategoryDto>> searchCategories(@RequestParam @NotBlank String keyword) {
-        return ResponseEntity.ok(categoryService.searchCategories(keyword));
+
+    @GetMapping("/search/{name}")
+    public ResponseEntity<List<CategoryDto>> searchCategoriesByName(@PathVariable String name) {
+        return ResponseEntity.ok(categoryService.getCategoriesByNameContaining(name));
     }
+
 }

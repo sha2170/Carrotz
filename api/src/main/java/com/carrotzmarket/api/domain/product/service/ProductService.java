@@ -1,5 +1,7 @@
 package com.carrotzmarket.api.domain.product.service;
 
+import com.carrotzmarket.api.domain.category.dto.CategoryDto;
+
 import com.carrotzmarket.api.domain.favoriteProduct.repository.FavoriteProductRepository;
 import com.carrotzmarket.api.domain.product.dto.ProductCreateRequestDto;
 import com.carrotzmarket.api.domain.product.dto.ProductResponseDto;
@@ -14,6 +16,9 @@ import com.carrotzmarket.db.favoriteProduct.FavoriteProductEntity;
 import com.carrotzmarket.db.product.ProductEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 
+import java.util.Comparator;
+import java.util.List;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,14 +28,13 @@ import java.util.stream.Collectors;
 
 import com.carrotzmarket.db.productImage.ProductImageEntity;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
 
 @Service
 @Transactional
@@ -44,18 +48,15 @@ public class ProductService {
     private final FileUploadService fileUploadService;
     private final FavoriteProductRepository favoriteProductRepository;
 
-    // ProductEntity를 조회하는 메서드
     public ProductEntity findProductById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
     }
 
     public ProductEntity createProduct(ProductCreateRequestDto request) {
-        // 카테고리 조회
         CategoryEntity category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Category not found with ID: " + request.getCategoryId()));
 
-        // DTO -> Entity 변환
         ProductEntity product = ProductEntity.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -65,6 +66,9 @@ public class ProductService {
                 .category(category)
                 .status(request.getStatus())
                 .build();
+
+        return productRepository.save(product);
+    }
 
         // 상품 저장
         ProductEntity savedProduct = productRepository.save(product);
@@ -102,31 +106,39 @@ public class ProductService {
                 .map(ProductImageEntity::getImageUrl)
                 .collect(Collectors.toList());
 
+        CategoryDto categoryDto = product.getCategory() != null ?
+                new CategoryDto(product.getCategory().getId(), product.getCategory().getName(), product.getCategory().getDescription(), product.getCategory().isEnabled()) :
+                null;
+
         return new ProductResponseDto(
                 product.getId(),
                 product.getTitle(),
                 product.getDescription(),
                 product.getPrice(),
-                product.getCategory() != null ? product.getCategory().getId() : null,
                 product.getUserId(),
                 product.getRegionId(),
+                categoryDto,
+                product.getStatus()
                 product.getStatus(),
                 imageUrls
         );
     }
 
-    // 제품 수정
     @Transactional
     public ProductResponseDto updateProduct(Long id, ProductUpdateRequestDto request) {
         ProductEntity product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
 
-        // 사용자가 수정할 항목 업데이트
         product.setTitle(request.getTitle());
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
 
-        productRepository.save(product); // JPA 변경감지로 저장
+        productRepository.save(product);
+
+        CategoryDto categoryDto = product.getCategory() != null ?
+                new CategoryDto(product.getCategory().getId(), product.getCategory().getName(), product.getCategory().getDescription(), product.getCategory().isEnabled()) :
+                null;
+        productRepository.save(product); 
 
         List<String> imageUrls = productImageService.getProductImageByProductId(id).stream()
                 .map(ProductImageEntity::getImageUrl)
@@ -137,23 +149,15 @@ public class ProductService {
                 product.getTitle(),
                 product.getDescription(),
                 product.getPrice(),
-                product.getCategory() != null ? product.getCategory().getId() : null,
                 product.getUserId(),
                 product.getRegionId(),
+                categoryDto,
+                product.getStatus()
                 product.getStatus(),
                 imageUrls
         );
     }
 
-    // 제품 삭제
-    @Transactional
-    public void deleteProduct(Long id) {
-        ProductEntity product = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
-        productRepository.delete(product);
-    }
-
-    // 거래 상태 변경
     @Transactional
     public ProductResponseDto updateProductStatus(Long id, ProductStatus status) {
         ProductEntity product = productRepository.findById(id)
@@ -162,6 +166,9 @@ public class ProductService {
         product.setStatus(status);
         productRepository.save(product);
 
+        CategoryDto categoryDto = product.getCategory() != null ?
+                new CategoryDto(product.getCategory().getId(), product.getCategory().getName(), product.getCategory().getDescription(), product.getCategory().isEnabled()) :
+                null;
         List<String> imageUrls = productImageService.getProductImageByProductId(id).stream()
                 .map(ProductImageEntity::getImageUrl)
                 .collect(Collectors.toList());
@@ -171,9 +178,19 @@ public class ProductService {
                 product.getTitle(),
                 product.getDescription(),
                 product.getPrice(),
-                product.getCategory() != null ? product.getCategory().getId() : null,
                 product.getUserId(),
                 product.getRegionId(),
+                categoryDto,
+                product.getStatus()
+        );
+    }
+
+    public void deleteProduct(Long id) {
+        ProductEntity product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
+        productRepository.delete(product);
+    }
+
                 product.getStatus(),
                 imageUrls
         );
@@ -251,7 +268,6 @@ public class ProductService {
         return productRepository.findByUserId(userId);
     }
 
-
     public List<ProductEntity> searchProductByTitle(String title) {
         return productRepository.findByTitleContaining(title);
     }
@@ -260,96 +276,53 @@ public class ProductService {
         return productRepository.findByStatus(status);
     }
 
-
     public List<ProductEntity> getProductByRegion(Long regionId) {
         return productRepository.findByRegionId(regionId);
     }
-
 
     public List<ProductEntity> getTop10Products() {
         return productRepository.findTop10ByOrderByCreatedAtDesc();
     }
 
-
     public List<ProductEntity> getProductByUserIdAndStatus(Long userId, ProductStatus status) {
         return productRepository.findByUserIdAndStatus(userId, status);
     }
 
-    public List<ProductEntity> getProductByCategory(String categoryName) {
-        return productRepository.findByCategories_Name(categoryName);
+    public List<ProductEntity> getProductsByCategory(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId);
     }
 
-    // 가격 범위로 상품 필터링
-    public List<ProductEntity> getProductsByPriceRange(Integer minPrice, Integer maxPrice) {
-        if (minPrice == null) minPrice = 0; // 기본 최소값
-        if (maxPrice == null) maxPrice = Integer.MAX_VALUE; // 기본 최대값
+    public List<ProductEntity> getProductsByCategoryName(String categoryName) {
+        return productRepository.findByCategoryNameContaining(categoryName);
+    }
+
+    public List<ProductEntity> getProductsSortedByCreatedAtAndUpdatedAt() {
+        return productRepository.findAllByOrderByCreatedAtDescUpdatedAtDesc();
+    }
+
+    public List<ProductEntity> getProductsSortedByCreatedAt() {
+        return productRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    public List<ProductEntity> getProductsSortedByUpdatedAt() {
+        return productRepository.findAllByOrderByUpdatedAtDesc();
+    }
+
+
+    public List<ProductEntity> getProductsByPriceRangeAndSort(int minPrice, int maxPrice) {
+        List<ProductEntity> products = productRepository.findByPriceBetween(minPrice, maxPrice);
+        return products.stream()
+                .sorted(Comparator.comparing(ProductEntity::getCreatedAt)
+                        .thenComparing(ProductEntity::getUpdatedAt)
+                        .reversed())
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductEntity> getProductsByPriceRange(int minPrice, int maxPrice) {
         return productRepository.findByPriceBetween(minPrice, maxPrice);
     }
 
-    // 정렬 범위로 상품 필터링
-    public List<ProductEntity> getProductsSortedBy(String sortBy, Integer minPrice, Integer maxPrice) {
-        if (minPrice == null) minPrice = 0;
-        if (maxPrice == null) maxPrice = Integer.MAX_VALUE;
-
-        if ("newest".equalsIgnoreCase(sortBy)) {
-            return productRepository.findByPriceBetweenOrderByCreatedAtDesc(minPrice, maxPrice);
-        } else if ("popular".equalsIgnoreCase(sortBy)) {
-            return productRepository.findByPriceBetweenOrderByFavoriteCountDesc(minPrice, maxPrice);
-        } else {
-            throw new IllegalArgumentException("Invalid sortBy value. Use 'newest' or 'popular'.");
-        }
-    }
-
-    // 카테고리 기반 상품 필터링
-    public List<ProductEntity> getProductsByCategory(Long categoryId, Integer minPrice, Integer maxPrice, String sortBy) {
-        if (minPrice == null) minPrice = 0;
-        if (maxPrice == null) maxPrice = Integer.MAX_VALUE;
-
-        // 하위 카테고리 포함한 ID 목록 조회
-        List<Long> categoryIds = getCategoryHierarchy(categoryId);
-
-        // 정렬 조건에 따라 상품 조회
-        if ("newest".equalsIgnoreCase(sortBy)) {
-            return productRepository.findByCategories_IdInAndPriceBetweenOrderByCreatedAtDesc(categoryIds, minPrice, maxPrice);
-        } else if ("popular".equalsIgnoreCase(sortBy)) {
-            return productRepository.findByCategories_IdInAndPriceBetweenOrderByFavoriteCountDesc(categoryIds, minPrice, maxPrice);
-        } else {
-            return productRepository.findByCategories_IdInAndPriceBetween(categoryIds, minPrice, maxPrice);
-        }
-    }
-
-    // 하위 카테고리 탐색
-    private List<Long> getCategoryHierarchy(Long categoryId) {
-        // Optional에서 CategoryEntity 추출
-        CategoryEntity category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found with ID: " + categoryId));
-        List<Long> categoryIds = new ArrayList<>();
-        collectCategoryIds(category, categoryIds);
-        return categoryIds;
-    }
-
-    private void collectCategoryIds(CategoryEntity category, List<Long> categoryIds) {
-        categoryIds.add(category.getId());
-        for (CategoryEntity child : category.getChildren()) {
-            collectCategoryIds(child, categoryIds);
-        }
-    }
-
-    // 지역 기반 상품 필터링 로직 추가
-    public List<ProductEntity> getProductsByRegion(Long regionId, Integer minPrice, Integer maxPrice, String sortBy) {
-        if (minPrice == null) minPrice = 0; // 기본 최소값
-        if (maxPrice == null) maxPrice = Integer.MAX_VALUE; // 기본 최대값
-
-        // 하위 지역 포함한 ID 목록 조회
-        List<Long> regionIds = regionService.getRegionHierarchy(regionId);
-
-        // 정렬 조건에 따라 상품 조회
-        if ("newest".equalsIgnoreCase(sortBy)) {
-            return productRepository.findByRegionIdInAndPriceBetweenOrderByCreatedAtDesc(regionIds, minPrice, maxPrice);
-        } else if ("popular".equalsIgnoreCase(sortBy)) {
-            return productRepository.findByRegionIdInAndPriceBetweenOrderByFavoriteCountDesc(regionIds, minPrice, maxPrice);
-        } else {
-            return productRepository.findByRegionIdInAndPriceBetween(regionIds, minPrice, maxPrice);
-        }
+    public List<ProductEntity> getProductsByPriceRangeAndSortCustom(int minPrice, int maxPrice) {
+        return productRepository.findByPriceBetween(minPrice, maxPrice);
     }
 }

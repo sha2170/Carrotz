@@ -1,67 +1,64 @@
 package com.carrotzmarket.api.domain.region.service;
 
-import com.carrotzmarket.api.common.error.RegionErrorCode;
-import com.carrotzmarket.api.common.exception.ApiException;
-import com.carrotzmarket.api.domain.region.repository.RegionRepository;
 import com.carrotzmarket.db.region.RegionEntity;
+import com.carrotzmarket.db.user.UserEntity;
+import com.carrotzmarket.db.user.UserRegionEntity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class RegionService {
 
-    private final RegionRepository regionRepository;
+    @PersistenceContext
+    private EntityManager em;
 
-    public RegionEntity findById(Long id) {
-        return regionRepository.findById(id)
-                .orElseThrow(() -> new ApiException(RegionErrorCode.INVALID_REGION, "유효하지 않은 지역 ID입니다."));
-    }
+    // 사용자에 지역 추가
+    public void addUserRegion(Long userId, Long regionId) {
+        UserEntity user = em.find(UserEntity.class, userId);
+        RegionEntity region = em.find(RegionEntity.class, regionId);
 
-    public RegionEntity findByName(String name) {
-        return regionRepository.findByName(name)
-                .orElseThrow(() -> new ApiException(RegionErrorCode.INVALID_REGION, "지역 이름이 유효하지 않습니다."));
-    }
-
-    @Transactional
-    public RegionEntity addRegion(String name, Long parentId) {
-        RegionEntity parentRegion = null;
-        if (parentId != null) {
-            parentRegion = findById(parentId);
+        if (user == null || region == null) {
+            throw new IllegalArgumentException("User or Region not found.");
         }
 
-        RegionEntity region = RegionEntity.builder()
-                .name(name)
-                .parentRegion(parentRegion)
-                .build();
+        UserRegionEntity userRegion = new UserRegionEntity();
+        userRegion.setUser(user);
+        userRegion.setRegion(region);
 
-        return regionRepository.save(region);
+        em.persist(userRegion);
+        user.getUserRegions().add(userRegion);
     }
 
-    public List<RegionEntity> findAllRegions() {
-        return regionRepository.findAll();
-    }
+    // 지역 저장
+    public void saveRegion(String name, Long parentId){
+        RegionEntity region = new RegionEntity();
+        region.setName(name);
 
-    public List<Long> getRegionHierarchy(Long regionId) {
-        RegionEntity region = findById(regionId);
-        if (region == null) {
-            throw new IllegalArgumentException("Region with ID " + regionId + " not found.");
+        // 부모의 id가 Null이 아니면 실행
+        if(parentId != null){
+            RegionEntity parentregion = em.find(RegionEntity.class, parentId);
+            // 부모지역이 Null이 아니라면 실행
+            if(parentregion != null){
+                region.setParentRegion(parentregion);
+                parentregion.getChildRegions().add(region);
+            }
         }
-
-        List<Long> regionIds = new ArrayList<>();
-        collectRegionIds(region, regionIds);
-        return regionIds;
+        em.persist(region);
     }
 
-    private void collectRegionIds(RegionEntity region, List<Long> regionIds) {
-        regionIds.add(region.getId());
-        for (RegionEntity child : region.getChildRegions()) {
-            collectRegionIds(child, regionIds);
-        }
+    // ID로 지역 조회
+    public RegionEntity findById(Long id){
+        return em.find(RegionEntity.class, id);
+    }
+
+    // 모든 지역 조회
+    public List<RegionEntity> findAllRegions(){
+        return em.createQuery("SELECT r FROM RegionEntity r", RegionEntity.class)
+                .getResultList();
     }
 }
