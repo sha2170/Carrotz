@@ -39,7 +39,7 @@ public class UserEntity {
     private LocalDate birthday; // 생일
 
     @Column(name = "profile_image_url", length = 255)
-    private String profile_iamge_url;
+    private String profileImageUrl;
 
     @Column(name = "is_deleted")
     private boolean isDeleted; // 삭제 여부 / 1, 0 으로 구분하여 확인
