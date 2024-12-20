@@ -9,11 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-/**
- * CategoryService
- * - 비즈니스 로직을 처리합니다.
- * - 카테고리 계층 구조를 생성하고, 특정 카테고리 또는 검색 기능을 제공합니다.
- */
 @Service
 @Transactional
 public class CategoryService {
@@ -25,37 +20,22 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    /**
-     * 모든 카테고리를 계층 구조로 조회합니다.
-     * @return 계층 구조의 카테고리 목록
-     */
     public List<CategoryDto> getAllCategories() {
         return buildCategoryTree(categoryRepository.findAll());
     }
 
-    /**
-     * 특정 카테고리와 하위 카테고리를 조회합니다.
-     * @param id 카테고리 ID
-     * @return 카테고리 정보
-     */
-    public CategoryDto getCategoryWithSubcategories(Long id) {
+    public CategoryDto getCategoryById(Long id) {
         Optional<CategoryEntity> categoryOptional = categoryRepository.findById(id);
         if (categoryOptional.isEmpty()) {
             throw new IllegalArgumentException("Category not found with ID: " + id);
         }
-        CategoryEntity category = categoryOptional.get();
-        return convertToDto(category);
+        return convertToDto(categoryOptional.get());
     }
 
-    /**
-     * 키워드를 포함하는 카테고리를 검색합니다.
-     * @param keyword 검색 키워드
-     * @return 검색된 카테고리 목록
-     */
-    public List<CategoryDto> searchCategories(String keyword) {
-        return categoryRepository.findByNameContainingIgnoreCase(keyword)
-                .stream()
-                .map(this::convertToDto)
+    public List<CategoryDto> getCategoriesByNameContaining(String name) {
+        List<CategoryEntity> categories = categoryRepository.findByNameContaining(name);
+        return categories.stream()
+                .map(this::convertToDto) // 카테고리 엔티티를 DTO로 변환
                 .toList();
     }
 
