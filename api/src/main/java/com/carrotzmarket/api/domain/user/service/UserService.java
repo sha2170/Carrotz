@@ -16,7 +16,13 @@ import com.carrotzmarket.db.user.UserRegionEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -27,7 +33,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserConverter userConverter;
-
 
     public Api<UserResponse> register(UserRegisterRequest request) {
 
@@ -71,7 +76,7 @@ public class UserService {
         Optional.ofNullable(request.getEmail()).ifPresent(userEntity::setEmail);
         Optional.ofNullable(request.getPhone()).ifPresent(userEntity::setPhone);
         Optional.ofNullable(request.getPassword()).ifPresent(userEntity::setPassword);
-        Optional.ofNullable(request.getProfileImageUrl()).ifPresent(userEntity::setProfile_iamge_url);
+        Optional.ofNullable(request.getProfileImageUrl()).ifPresent(userEntity::setProfileImageUrl);
 
         if (request.getRegionId() != null) {
             RegionEntity region = userRepository.findRegionById(request.getRegionId())
@@ -108,10 +113,57 @@ public class UserService {
         return UserResponse.builder()
                 .loginId(user.getLoginid())
                 .email(user.getEmail())
-                .profileImageUrl(user.getProfile_iamge_url())
+                .profileImageUrl(user.getProfileImageUrl())
                 .region(user.getRegion())
                 .build();
     }
 
+
+    public String uploadProfileImage(MultipartFile file, String loginId) {
+        UserEntity user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "해당 사용자가 없음"));
+
+        if (file == null || file.isEmpty() || !file.getContentType().startsWith("image/")) {
+            throw new ApiException(UserErrorCode.FILE_NOT_UPLOADED, "이미지 파일만 업로드할 수 있습니다.");
+        }
+
+        String uploadDirectory = "uploads/profile-images/";
+
+        try {
+            // 디렉토리 생성 확인
+            File directory = new File(uploadDirectory);
+            if (!directory.exists() && !directory.mkdirs()) {
+                throw new ApiException(UserErrorCode.FILE_NOT_UPLOADED, "파일 저장 디렉토리 생성에 실패했습니다.");
+            }
+
+            // 기존 이미지 삭제
+            if (user.getProfileImageUrl() != null) {
+                File existingFile = new File(uploadDirectory + user.getProfileImageUrl());
+                if (existingFile.exists() && !existingFile.delete()) {
+                    throw new ApiException(UserErrorCode.FILE_NOT_UPLOADED, "기존 파일 삭제에 실패했습니다.");
+                }
+            }
+
+            // 새 이미지 저장
+            String fileName = loginId + "-" + System.currentTimeMillis() + "-" + file.getOriginalFilename();
+            Path filePath = Paths.get(uploadDirectory, fileName);
+
+            if (!Files.exists(filePath.getParent())) {
+                Files.createDirectories(filePath.getParent());
+            }
+            file.transferTo(filePath.toFile());
+
+            // URL 설정
+            String fileUrl = "/static/profile-images/" + fileName;
+            user.setProfileImageUrl(fileUrl);
+            userRepository.save(user);
+
+            return fileUrl;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new ApiException(UserErrorCode.FILE_NOT_UPLOADED, "파일 업로드에 실패");
+        }
+    }
 
 }
