@@ -34,8 +34,6 @@ public class ProductCreateRequestDto {
 
     private Long regionId;
 
-
-    private List<String> categories;
     private Long categoryId;
 
     private ProductStatus status;
