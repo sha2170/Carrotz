@@ -38,7 +38,7 @@ public class UserOpenApiController {
                 userResponse.getEmail(),
                 userResponse.getPhone(),
                 userResponse.getProfileImageUrl(),
-                userResponse.getRegionName()
+                userResponse.getRegion()
         );
         session.setAttribute("userSession", sessionInfo);
 

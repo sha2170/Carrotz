@@ -37,6 +37,8 @@ public class UserConverter {
                 .phone(request.getPhone())
                 .birthday(request.getBirthday() != null ? (request.getBirthday()) : null)
                 .profile_iamge_url(request.getProfileImageUrl())
+                .region(region.getName())
+                .lastLoginAt(LocalDateTime.now())
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -70,7 +72,8 @@ public class UserConverter {
                 .createdAt(userEntity.getCreatedAt())
                 .lastLoginAt(userEntity.getLastLoginAt())
                 .isDeleted(userEntity.isDeleted())
-                .regionName(userEntity.getUserRegions() != null && !userEntity.getUserRegions().isEmpty() ? userEntity.getUserRegions().get(0).getRegion().getName() : null)
+                .region(userEntity.getRegion())
+//                .regionName(userEntity.getUserRegions() != null && !userEntity.getUserRegions().isEmpty() ? userEntity.getUserRegions().get(0).getRegion().getName() : null)
                 .build();
     }
 }
