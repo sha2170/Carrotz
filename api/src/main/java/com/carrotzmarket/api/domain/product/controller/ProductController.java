@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,12 +50,14 @@ public class ProductController {
     }
 
     @PostMapping("/{productId}/favorite")
-    public ResponseEntity<String> addFavoriteProduct(
-            @RequestParam Long userId,
-            @PathVariable Long productId) {
-        String message = productService.addFavoriteProduct(userId, productId);
-        return ResponseEntity.ok(message);
+    public String addFavoriteProduct(@RequestParam Long userId, @PathVariable Long productId) {
+        try {
+            return productService.addFavoriteProduct(userId, productId);
+        } catch (IllegalArgumentException e) {
+            return e.getMessage();
+        }
     }
+
 
     @DeleteMapping("/{productId}/favorite")
     public ResponseEntity<String> removeFavoriteProduct(
@@ -64,16 +67,21 @@ public class ProductController {
         return ResponseEntity.ok(message);
     }
 
-    @GetMapping("/user/{userId}/favorites")
-    public ResponseEntity<List<ProductResponseDto>> getFavoriteProductsByUserId(@PathVariable Long userId) {
-        List<ProductResponseDto> favorites = productService.getFavoriteProductsByUserId(userId);
-        return ResponseEntity.ok(favorites);
+    @GetMapping("/{userId}/favorites")
+    public ResponseEntity<?> getFavoriteProducts(@PathVariable Long userId) {
+        List<Object> favoriteProducts = productService.getFavoriteProductsByUserId(userId);
+
+        if (favoriteProducts.size() == 1 && favoriteProducts.get(0) instanceof String) {
+            return ResponseEntity.ok(Map.of("message", favoriteProducts.get(0)));
+        }
+
+        return ResponseEntity.ok(favoriteProducts);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
-        return ResponseEntity.ok("Product deleted successfully.");
+        return ResponseEntity.ok("해당 상품이 삭제되었습니다.");
     }
 
     @GetMapping("/search")

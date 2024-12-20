@@ -135,7 +135,8 @@ public class ProductService {
 
 
     public String addFavoriteProduct(Long userId, Long productId) {
-        ProductEntity product = findProductById(productId);
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 상품입니다."));
 
         Optional<FavoriteProductEntity> existingFavorite = favoriteProductRepository.findByUserIdAndProductId(userId, productId);
         if (existingFavorite.isPresent()) {
@@ -165,22 +166,32 @@ public class ProductService {
     }
 
 
-    public List<ProductResponseDto> getFavoriteProductsByUserId(Long userId) {
+    public List<Object> getFavoriteProductsByUserId(Long userId) {
         List<FavoriteProductEntity> favoriteProducts = favoriteProductRepository.findByUserId(userId);
+
+        if (favoriteProducts.isEmpty()) {
+            return List.of("해당 유저의 관심 상품이 등록되어 있지 않습니다.");
+        }
 
         return favoriteProducts.stream()
                 .map(favorite -> {
                     ProductEntity product = favorite.getProduct();
+
+                    if (product == null) {
+                        return "해당 상품은 등록되어 있지 않은 상품입니다.";
+                    }
+
                     List<String> imageUrls = productImageService.getProductImageByProductId(product.getId())
                             .stream()
                             .map(ProductImageEntity::getImageUrl)
                             .collect(Collectors.toList());
 
-                    // 생성자 호출 수정
                     return new ProductResponseDto(product, imageUrls);
                 })
                 .collect(Collectors.toList());
     }
+
+
 
 
     public ProductResponseDto updateProduct(Long id, ProductUpdateRequestDto request) {
