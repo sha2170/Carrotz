@@ -14,9 +14,8 @@ import java.time.LocalDateTime;
 @Builder
 public class UserResponse {
 
-    /* 유저에게 반환될 데이터
-    * password는 민감정보이기 때문에 반환하지 않는다.
-    * 였지만 개인정보 변경 문제로 인해 같이 반환해주는 것으로 변경
+    /*  password는 민감정보이기 때문에 반환하지 않는다.
+    *  하지만 개인정보 변경 기능으로 인해 같이 반환해주는 것으로 변경
     */
     private Long id;
 
@@ -34,7 +33,7 @@ public class UserResponse {
 
     private boolean isDeleted;
 
-    private String regionName;
+    private String region;
 
     private LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
