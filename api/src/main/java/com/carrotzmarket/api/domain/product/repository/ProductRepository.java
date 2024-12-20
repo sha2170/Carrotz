@@ -4,6 +4,8 @@ import com.carrotzmarket.db.product.ProductEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 import java.util.List;
 import java.util.Optional;
+
+import org.springdoc.core.converters.models.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
@@ -29,4 +31,12 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     List<ProductEntity> findByCategoryId(Long categoryId);
 
     List<ProductEntity> findByCategoryNameContaining(String categoryName);
+
+    List<ProductEntity> findAllByOrderByCreatedAtDescUpdatedAtDesc();
+
+    List<ProductEntity> findAllByOrderByCreatedAtDesc();
+
+    List<ProductEntity> findAllByOrderByUpdatedAtDesc();
+
+    List<ProductEntity> findByPriceBetween(int minPrice, int maxPrice);
 }
