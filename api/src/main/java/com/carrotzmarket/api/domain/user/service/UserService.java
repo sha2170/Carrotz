@@ -12,13 +12,13 @@ import com.carrotzmarket.api.domain.user.converter.UserConverter;
 import com.carrotzmarket.api.domain.user.repository.UserRepository;
 import com.carrotzmarket.db.region.RegionEntity;
 import com.carrotzmarket.db.user.UserEntity;
-import com.carrotzmarket.db.user.UserRegionEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,24 +69,17 @@ public class UserService {
     }
 
 
-    public UserResponse updateUser(String loginId, UserUpdateRequest request) {
-        UserEntity userEntity = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "해당 사용자를 찾을 수 없습니다."));
 
-        Optional.ofNullable(request.getEmail()).ifPresent(userEntity::setEmail);
-        Optional.ofNullable(request.getPhone()).ifPresent(userEntity::setPhone);
-        Optional.ofNullable(request.getPassword()).ifPresent(userEntity::setPassword);
-        Optional.ofNullable(request.getProfileImageUrl()).ifPresent(userEntity::setProfileImageUrl);
+    public UserResponse findUserByLoginId(String loginId) {
+        UserEntity user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "해당하는 ID는 없습니다."));
 
-        if (request.getRegionId() != null) {
-            RegionEntity region = userRepository.findRegionById(request.getRegionId())
-                    .orElseThrow(() -> new ApiException(RegionErrorCode.REGION_NOT_FOUND, "해당 지역을 찾지 못했습니다."));
-            userEntity.getUserRegions().clear();
-            userEntity.getUserRegions().add(UserRegionEntity.builder().user(userEntity).region(region).build());
-        }
-
-        userRepository.save(userEntity);
-        return userConverter.toResponse(userEntity);
+        return UserResponse.builder()
+                .loginId(user.getLoginid())
+                .email(user.getEmail())
+                .profileImageUrl(user.getProfileImageUrl())
+                .region(user.getRegion())
+                .build();
     }
 
 
@@ -106,64 +99,49 @@ public class UserService {
     }
 
 
-    public UserResponse findUserByLoginId(String loginId) {
-        UserEntity user = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "해당하는 ID는 없습니다."));
+    @Value("${file.dir:/default/path/to/uploads}")
+    private String profileImageDir;
 
-        return UserResponse.builder()
-                .loginId(user.getLoginid())
-                .email(user.getEmail())
-                .profileImageUrl(user.getProfileImageUrl())
-                .region(user.getRegion())
-                .build();
-    }
+    public UserResponse updateUser(String loginId, UserUpdateRequest request, MultipartFile profileImage) {
+        UserEntity userEntity = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다."));
 
+        // 이메일, 전화번호, 비밀번호 업데이트
+        Optional.ofNullable(request.getEmail()).ifPresent(userEntity::setEmail);
+        Optional.ofNullable(request.getPhone()).ifPresent(userEntity::setPhone);
+        Optional.ofNullable(request.getPassword()).ifPresent(userEntity::setPassword);
 
-    public String uploadProfileImage(MultipartFile file, String loginId) {
-        UserEntity user = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND, "해당 사용자가 없음"));
-
-        if (file == null || file.isEmpty() || !file.getContentType().startsWith("image/")) {
-            throw new ApiException(UserErrorCode.FILE_NOT_UPLOADED, "이미지 파일만 업로드할 수 있습니다.");
+        // 지역 정보 업데이트
+        if (request.getRegionId() != null) {
+            RegionEntity region = userRepository.findRegionById(request.getRegionId())
+                    .orElseThrow(() -> new ApiException(RegionErrorCode.REGION_NOT_FOUND, "해당 지역을 찾지 못했습니다."));
+            userEntity.setRegion(region.getName());
         }
 
-        String uploadDirectory = "uploads/profile-images/";
+        // 프로필 이미지 처리
+        if (profileImage != null && !profileImage.isEmpty()) {
+            try {
+                // 기존 이미지 삭제
+                Optional.ofNullable(userEntity.getProfileImageUrl()).ifPresent(existingImage -> {
+                    try {
+                        Files.deleteIfExists(Paths.get(profileImageDir + existingImage));
+                    } catch (IOException e) {
+                        throw new ApiException(UserErrorCode.FILE_NOT_UPLOADED, "기존 이미지 삭제 실패");
+                    }
+                });
 
-        try {
-            // 디렉토리 생성 확인
-            File directory = new File(uploadDirectory);
-            if (!directory.exists() && !directory.mkdirs()) {
-                throw new ApiException(UserErrorCode.FILE_NOT_UPLOADED, "파일 저장 디렉토리 생성에 실패했습니다.");
+                // 새 이미지 저장
+                String filename = loginId + "_" + StringUtils.cleanPath(profileImage.getOriginalFilename());
+                Path filePath = Paths.get(profileImageDir).resolve(filename);
+                Files.copy(profileImage.getInputStream(), filePath);
+
+                userEntity.setProfileImageUrl("/uploads/profile-images/" + filename);
+            } catch (IOException e) {
+                throw new ApiException(UserErrorCode.FILE_NOT_UPLOADED, "프로필 이미지 업로드 실패");
             }
-
-            // 기존 이미지 삭제
-            if (user.getProfileImageUrl() != null) {
-                File existingFile = new File(uploadDirectory + user.getProfileImageUrl());
-                if (existingFile.exists() && !existingFile.delete()) {
-                    throw new ApiException(UserErrorCode.FILE_NOT_UPLOADED, "기존 파일 삭제에 실패했습니다.");
-                }
-            }
-
-            // 새 이미지 저장
-            String fileName = loginId + "-" + System.currentTimeMillis() + "-" + file.getOriginalFilename();
-            Path filePath = Paths.get(uploadDirectory, fileName);
-
-            if (!Files.exists(filePath.getParent())) {
-                Files.createDirectories(filePath.getParent());
-            }
-            file.transferTo(filePath.toFile());
-
-            // URL 설정
-            String fileUrl = "/static/profile-images/" + fileName;
-            user.setProfileImageUrl(fileUrl);
-            userRepository.save(user);
-
-            return fileUrl;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new ApiException(UserErrorCode.FILE_NOT_UPLOADED, "파일 업로드에 실패");
         }
-    }
 
+        userRepository.save(userEntity);
+        return userConverter.toResponse(userEntity);
+    }
 }
