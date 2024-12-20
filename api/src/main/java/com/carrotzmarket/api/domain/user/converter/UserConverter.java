@@ -36,7 +36,7 @@ public class UserConverter {
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .birthday(request.getBirthday() != null ? (request.getBirthday()) : null)
-                .profile_iamge_url(request.getProfileImageUrl())
+                .profileImageUrl(request.getProfileImageUrl())
                 .region(region.getName())
                 .lastLoginAt(LocalDateTime.now())
                 .createdAt(LocalDateTime.now())
@@ -68,12 +68,11 @@ public class UserConverter {
                 .email(userEntity.getEmail())
                 .phone(userEntity.getPhone())
                 .birthday(userEntity.getBirthday())
-                .profileImageUrl(userEntity.getProfile_iamge_url())
+                .profileImageUrl(userEntity.getProfileImageUrl())
                 .createdAt(userEntity.getCreatedAt())
                 .lastLoginAt(userEntity.getLastLoginAt())
                 .isDeleted(userEntity.isDeleted())
                 .region(userEntity.getRegion())
-//                .regionName(userEntity.getUserRegions() != null && !userEntity.getUserRegions().isEmpty() ? userEntity.getUserRegions().get(0).getRegion().getName() : null)
                 .build();
     }
 }
