@@ -60,7 +60,6 @@ public class ProductEntity {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private CategoryEntity category;
 
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -79,16 +78,6 @@ public class ProductEntity {
 
     @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private ProductTransactionEntity transaction;
-
-    // 수정된 부분: 카테고리 다대다 관계
-    @ManyToMany
-    @JoinTable(
-            name = "product_category",  // 중간 테이블 이름
-            joinColumns = @JoinColumn(name = "product_id"),  // 제품 ID
-            inverseJoinColumns = @JoinColumn(name = "category_id")  // 카테고리 ID
-    )
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private List<CategoryEntity> categories;  // 여러 카테고리를 저장
 
     @PrePersist
     protected void onCreate() {
