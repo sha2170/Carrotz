@@ -20,6 +20,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import com.carrotzmarket.db.product.ProductStatus;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.ResponseEntity;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -144,6 +151,51 @@ public class ProductController {
                         new CategoryDto(product.getCategory().getId(), product.getCategory().getName(), product.getCategory().getDescription(), product.getCategory().isEnabled()),
                         product.getStatus()
                 ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/sorted-by-created-at-updated-at")
+    public List<ProductEntity> getProductsSortedByCreatedAtAndUpdatedAt() {
+        return productService.getProductsSortedByCreatedAtAndUpdatedAt();
+    }
+
+    @GetMapping("/sorted-by-created-at")
+    public List<ProductEntity> getProductsSortedByCreatedAt() {
+        return productService.getProductsSortedByCreatedAt();
+    }
+
+    @GetMapping("/sorted-by-updated-at")
+    public List<ProductEntity> getProductsSortedByUpdatedAt() {
+        return productService.getProductsSortedByUpdatedAt();
+    }
+
+    @GetMapping("/price-range")
+    public ResponseEntity<List<ProductResponseDto>> getProductsByPriceRange(
+            @RequestParam(defaultValue = "0") int minPrice,
+            @Parameter(
+                    schema = @Schema(allowableValues = {"0","5000", "10000", "20000"}),
+                    in = ParameterIn.QUERY
+            )
+            @RequestParam int maxPrice) {
+
+        List<ProductEntity> products = productService.getProductsByPriceRangeAndSort(minPrice, maxPrice);
+
+        List<ProductResponseDto> response = products.stream()
+                .map(ProductResponseDto::new)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/price-range/{minPrice}/{maxPrice}")
+    public ResponseEntity<List<ProductResponseDto>> getProductsByCustomPriceRange(
+            @PathVariable int minPrice,
+            @PathVariable int maxPrice) {
+        List<ProductEntity> products = productService.getProductsByPriceRangeAndSort(minPrice, maxPrice);
+        List<ProductResponseDto> response = products.stream()
+                .map(product -> new ProductResponseDto(product))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
