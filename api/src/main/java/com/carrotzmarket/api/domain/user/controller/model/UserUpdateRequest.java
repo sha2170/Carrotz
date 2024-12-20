@@ -13,6 +13,7 @@ public class UserUpdateRequest {
     private String password;
 
     private String profileImageUrl;
+
     @Email
     private String email;
 
