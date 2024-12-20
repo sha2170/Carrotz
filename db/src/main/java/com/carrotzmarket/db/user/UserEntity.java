@@ -1,6 +1,5 @@
 package com.carrotzmarket.db.user;
 
-import com.carrotzmarket.db.region.RegionEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -51,7 +50,6 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserRegionEntity> userRegions = new ArrayList<>();
 
-    @ManyToOne
-    @JoinColumn(name = "region_id")
-    private RegionEntity region;
+    @Column(length = 100)
+    private String region;
 }
