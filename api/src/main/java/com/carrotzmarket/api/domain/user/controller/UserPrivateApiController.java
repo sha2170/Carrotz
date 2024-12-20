@@ -8,8 +8,7 @@ import com.carrotzmarket.api.domain.user.controller.model.UserSessionInfo;
 import com.carrotzmarket.api.domain.user.controller.model.UserUpdateRequest;
 import com.carrotzmarket.api.domain.user.repository.UserRepository;
 import com.carrotzmarket.api.domain.user.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -32,11 +31,6 @@ public class UserPrivateApiController {
         return Api.OK(response);
     }
 
-    @PutMapping("/update")
-    public Api<UserResponse> updateUser(@RequestParam String loginId, @RequestBody UserUpdateRequest request) {
-        UserResponse response = userService.updateUser(loginId, request);
-        return Api.OK(response);
-    }
 
     @DeleteMapping("/delete")
     public Api<String> deleteUser(@RequestParam String loginId) {
@@ -49,7 +43,7 @@ public class UserPrivateApiController {
 
         HttpSession session = httpRequest.getSession(false);
 
-        if(session == null || session.getAttribute("userSession") == null) {
+        if (session == null || session.getAttribute("userSession") == null) {
             throw new ApiException(UserErrorCode.USER_NOT_FOUND, "세션 정보가 없음");
         }
 
@@ -64,20 +58,24 @@ public class UserPrivateApiController {
     }
 
 
-    // 스웨거에 이미지 올리기 위한 설정
-    @Operation(
-            summary = "Upload profile image",
-            description = "Allows the user to upload a profile image.",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
-            )
-    )
-    @PostMapping(value = "/profile/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Api<String> uploadProfileImage(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("loginId") String loginId) {
-        String fileUrl = userService.uploadProfileImage(file, loginId);
-        return Api.OK("프로필 사진 업로드 완료. URL: " + fileUrl);
+
+
+    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Api<UserResponse> updateUser(
+            @RequestParam String loginId,
+            @RequestPart(required = false) MultipartFile profileImage,
+            @RequestPart("request") UserUpdateRequest request) throws JsonProcessingException {
+
+        System.out.println("loginId: " + loginId);
+        System.out.println("profileImage: " + (profileImage != null ? profileImage.getOriginalFilename() : "없음"));
+        System.out.println("UserUpdateRequest: " + request);
+
+        if (request == null) {
+            throw new ApiException(UserErrorCode.FILE_NOT_UPLOADED, "User update data is missing.");
+        }
+
+        UserResponse response = userService.updateUser(loginId, request, profileImage);
+        return Api.OK(response);
     }
 }
 
