@@ -26,17 +26,22 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<?> createProduct(@ModelAttribute ProductCreateRequestDto productCreateRequestDto) {
+    public ResponseEntity<String> createProduct(@ModelAttribute ProductCreateRequestDto productCreateRequestDto) {
         ProductEntity product = productService.createProduct(productCreateRequestDto);
         return ResponseEntity.ok("Product created with ID: " + product.getId());
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long id) {
-        ProductResponseDto response = productService.getProductById(id);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> getProductById(@PathVariable Long id) {
+        try {
+            ProductResponseDto response = productService.getProductById(id);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
+
 
 
     @PatchMapping("/{id}")

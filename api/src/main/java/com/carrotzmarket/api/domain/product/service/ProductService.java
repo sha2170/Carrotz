@@ -69,8 +69,7 @@ public class ProductService {
             List<ProductImageEntity> productImages = new ArrayList<>();
             for (MultipartFile image : request.getImages()) {
                 try {
-                    // 파일 업로드 로직
-                    String imageUrl = fileUploadService.uploadFile(image); // 인스턴스를 통해 호출
+                    String imageUrl = fileUploadService.uploadFile(image);
                     ProductImageEntity productImage = new ProductImageEntity();
                     productImage.setProductId(savedProduct.getId());
                     productImage.setImageUrl(imageUrl);
@@ -88,8 +87,11 @@ public class ProductService {
 
     // 제품 조회
     public ProductResponseDto getProductById(Long id) {
-        ProductEntity product = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
+        ProductEntity product = productRepository.findById(id).orElse(null);
+
+        if (product == null) {
+            throw new RuntimeException("이 상품은 등록되지 않은 상품입니다.");
+        }
 
         List<ProductImageEntity> productImages = productImageService.getProductImageByProductId(id);
         List<String> imageUrls = productImages.stream()
