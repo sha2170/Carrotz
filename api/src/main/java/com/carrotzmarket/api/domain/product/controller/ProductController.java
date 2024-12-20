@@ -1,5 +1,6 @@
 package com.carrotzmarket.api.domain.product.controller;
 
+import com.carrotzmarket.api.domain.category.dto.CategoryDto;
 import com.carrotzmarket.api.domain.product.dto.ProductCreateRequestDto;
 import com.carrotzmarket.api.domain.product.dto.ProductResponseDto;
 import com.carrotzmarket.api.domain.product.dto.ProductUpdateRequestDto;
@@ -9,6 +10,8 @@ import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +31,7 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductCreateRequestDto productCreateRequestDto) {
         ProductEntity product = productService.createProduct(productCreateRequestDto);
-        return ResponseEntity.ok("Product created with ID: " + product);
+        return ResponseEntity.ok("Product created with ID: " + product.getId());
     }
 
     @GetMapping("/{id}")
@@ -67,8 +70,21 @@ public class ProductController {
     }
 
     @GetMapping("/user/{userId}")
-    public List<ProductEntity> getProductByUserId(@PathVariable Long userId) {
-        return productService.getProductByUserId(userId);
+    public ResponseEntity<List<ProductResponseDto>> getProductByUserId(@PathVariable Long userId) {
+        List<ProductEntity> products = productService.getProductByUserId(userId);
+        List<ProductResponseDto> response = products.stream()
+                .map(product -> new ProductResponseDto(
+                        product.getId(),
+                        product.getTitle(),
+                        product.getDescription(),
+                        product.getPrice(),
+                        product.getUserId(),
+                        product.getRegionId(),
+                        new CategoryDto(product.getCategory().getId(), product.getCategory().getName(), product.getCategory().getDescription(), product.getCategory().isEnabled()),  // CategoryDto로 변경
+                        product.getStatus()
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/search")
@@ -96,48 +112,39 @@ public class ProductController {
         return productService.getProductByUserIdAndStatus(userId, status);
     }
 
-    @GetMapping("/category")
-    public List<ProductEntity> getProductByCategory(@RequestParam String categoryName) {
-        return productService.getProductByCategory(categoryName);
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<List<ProductResponseDto>> getProductsByCategory(@PathVariable Long categoryId) {
+        List<ProductEntity> products = productService.getProductsByCategory(categoryId);
+        List<ProductResponseDto> response = products.stream()
+                .map(product -> new ProductResponseDto(
+                        product.getId(),
+                        product.getTitle(),
+                        product.getDescription(),
+                        product.getPrice(),
+                        product.getUserId(),
+                        product.getRegionId(),
+                        new CategoryDto(product.getCategory().getId(), product.getCategory().getName(), product.getCategory().getDescription(), product.getCategory().isEnabled()),
+                        product.getStatus()
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping
-    public List<ProductEntity> getFilteredProducts(
-            @RequestParam(required = false) Integer minPrice,
-            @RequestParam(required = false) Integer maxPrice
-    ) {
-        return productService.getProductsByPriceRange(minPrice, maxPrice);
-    }
-
-    // 정렬 범위로 상품 필터링
-    @GetMapping("/sort")
-    public List<ProductEntity> getSortedProducts(
-            @RequestParam String sortBy,
-            @RequestParam(required = false) Integer minPrice,
-            @RequestParam(required = false) Integer maxPrice
-    ) {
-        return productService.getProductsSortedBy(sortBy, minPrice, maxPrice);
-    }
-
-    // 카테고리 범위로 상품 필터링
-    @GetMapping("/category/filter")
-    public List<ProductEntity> getProductsByCategory(
-            @RequestParam Long categoryId,
-            @RequestParam(required = false) Integer minPrice,
-            @RequestParam(required = false) Integer maxPrice,
-            @RequestParam(required = false) String sortBy
-    ) {
-        return productService.getProductsByCategory(categoryId, minPrice, maxPrice, sortBy);
-    }
-
-    // 지역 기반 상품 필터링
-    @GetMapping("/region/filter")
-    public List<ProductEntity> getProductsByRegion(
-            @RequestParam Long regionId,
-            @RequestParam(required = false) Integer minPrice,
-            @RequestParam(required = false) Integer maxPrice,
-            @RequestParam(required = false) String sortBy
-    ) {
-        return productService.getProductsByRegion(regionId, minPrice, maxPrice, sortBy);
+    @GetMapping("/category-name")
+    public ResponseEntity<List<ProductResponseDto>> getProductsByCategoryName(@RequestParam String categoryName) {
+        List<ProductEntity> products = productService.getProductsByCategoryName(categoryName);
+        List<ProductResponseDto> response = products.stream()
+                .map(product -> new ProductResponseDto(
+                        product.getId(),
+                        product.getTitle(),
+                        product.getDescription(),
+                        product.getPrice(),
+                        product.getUserId(),
+                        product.getRegionId(),
+                        new CategoryDto(product.getCategory().getId(), product.getCategory().getName(), product.getCategory().getDescription(), product.getCategory().isEnabled()),
+                        product.getStatus()
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 }
