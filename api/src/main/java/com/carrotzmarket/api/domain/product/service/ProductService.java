@@ -1,5 +1,6 @@
 package com.carrotzmarket.api.domain.product.service;
 
+import com.carrotzmarket.api.domain.favoriteProduct.repository.FavoriteProductRepository;
 import com.carrotzmarket.api.domain.product.dto.ProductCreateRequestDto;
 import com.carrotzmarket.api.domain.product.dto.ProductResponseDto;
 import com.carrotzmarket.api.domain.product.dto.ProductUpdateRequestDto;
@@ -9,6 +10,7 @@ import com.carrotzmarket.api.domain.productImage.service.FileUploadService;
 import com.carrotzmarket.api.domain.productImage.service.ProductImageService;
 import com.carrotzmarket.api.domain.region.service.RegionService;
 import com.carrotzmarket.db.category.CategoryEntity;
+import com.carrotzmarket.db.favoriteProduct.FavoriteProductEntity;
 import com.carrotzmarket.db.product.ProductEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.carrotzmarket.db.productImage.ProductImageEntity;
@@ -39,6 +42,7 @@ public class ProductService {
     private final RegionService regionService;
     private final ProductImageService productImageService;
     private final FileUploadService fileUploadService;
+    private final FavoriteProductRepository favoriteProductRepository;
 
     // ProductEntity를 조회하는 메서드
     public ProductEntity findProductById(Long id) {
@@ -174,6 +178,74 @@ public class ProductService {
                 imageUrls
         );
     }
+
+    // 관심 상품 등록
+    @Transactional
+    public String addFavoriteProduct(Long userId, Long productId) {
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("상품이 존재하지 않습니다."));
+
+        Optional<FavoriteProductEntity> existingFavorite = favoriteProductRepository.findByUserIdAndProductId(userId, productId);
+        if (existingFavorite.isPresent()) {
+            return "이미 관심 상품으로 등록되어 있습니다.";
+        }
+
+        FavoriteProductEntity favorite = FavoriteProductEntity.builder()
+                .userId(userId)
+                .product(product)
+                .build();
+        favoriteProductRepository.save(favorite);
+
+        return "관심 상품으로 등록되었습니다.";
+    }
+
+
+    // 관심 상품 해제
+    @Transactional
+    public String removeFavoriteProduct(Long userId, Long productId) {
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("상품이 존재하지 않습니다."));
+
+        Optional<FavoriteProductEntity> existingFavorite =
+                favoriteProductRepository.findByUserIdAndProductId(userId, productId);
+
+        if (existingFavorite.isEmpty()) {
+            return "해당 상품은 관심 상품으로 등록되어 있지 않습니다.";
+        }
+
+        favoriteProductRepository.delete(existingFavorite.get());
+        return "관심 상품이 정상적으로 해제되었습니다.";
+    }
+
+
+    // 관심 상품 조회
+    @Transactional(readOnly = true)
+    public List<ProductResponseDto> getFavoriteProductsByUserId(Long userId) {
+        List<FavoriteProductEntity> favoriteProducts = favoriteProductRepository.findByUserId(userId);
+
+        return favoriteProducts.stream()
+                .map(favorite -> {
+                    ProductEntity product = favorite.getProduct();
+                    List<String> imageUrls = productImageService.getProductImageByProductId(product.getId())
+                            .stream()
+                            .map(ProductImageEntity::getImageUrl)
+                            .collect(Collectors.toList());
+
+                    return new ProductResponseDto(
+                            product.getId(),
+                            product.getTitle(),
+                            product.getDescription(),
+                            product.getPrice(),
+                            product.getCategory() != null ? product.getCategory().getId() : null,
+                            product.getUserId(),
+                            product.getRegionId(),
+                            product.getStatus(),
+                            imageUrls
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
 
     public List<ProductEntity> getProductByUserId(Long userId) {
         return productRepository.findByUserId(userId);

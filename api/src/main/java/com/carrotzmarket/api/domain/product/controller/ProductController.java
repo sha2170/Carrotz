@@ -31,6 +31,18 @@ public class ProductController {
         return ResponseEntity.ok("Product created with ID: " + product.getId());
     }
 
+    @PostMapping("/{productId}/favorite")
+    public ResponseEntity<String> addFavoriteProduct(
+            @RequestParam Long userId,
+            @PathVariable Long productId) {
+        try {
+            String message = productService.addFavoriteProduct(userId, productId);
+            return ResponseEntity.ok(message);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductById(@PathVariable Long id) {
@@ -41,8 +53,6 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
-
-
 
     @PatchMapping("/{id}")
     public ResponseEntity<ProductResponseDto> updateProduct(
@@ -56,6 +66,18 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.ok("Product deleted successfully.");
+    }
+
+    @DeleteMapping("/{productId}/favorite")
+    public ResponseEntity<String> removeFavoriteProduct(
+            @RequestParam Long userId,
+            @PathVariable Long productId) {
+        try {
+            String message = productService.removeFavoriteProduct(userId, productId);
+            return ResponseEntity.ok(message);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @PatchMapping("/{id}/status")
@@ -76,6 +98,12 @@ public class ProductController {
     @GetMapping("/user/{userId}")
     public List<ProductEntity> getProductByUserId(@PathVariable Long userId) {
         return productService.getProductByUserId(userId);
+    }
+
+    @GetMapping("/user/{userId}/favorites")
+    public ResponseEntity<List<ProductResponseDto>> getFavoriteProducts(@PathVariable Long userId) {
+        List<ProductResponseDto> favoriteProducts = productService.getFavoriteProductsByUserId(userId);
+        return ResponseEntity.ok(favoriteProducts);
     }
 
     @GetMapping("/search")
