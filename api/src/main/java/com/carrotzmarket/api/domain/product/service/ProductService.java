@@ -11,7 +11,9 @@ import com.carrotzmarket.db.category.CategoryEntity;
 import com.carrotzmarket.db.product.ProductEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -155,5 +157,35 @@ public class ProductService {
 
     public List<ProductEntity> getProductsByCategoryName(String categoryName) {
         return productRepository.findByCategoryNameContaining(categoryName);
+    }
+
+    public List<ProductEntity> getProductsSortedByCreatedAtAndUpdatedAt() {
+        return productRepository.findAllByOrderByCreatedAtDescUpdatedAtDesc();
+    }
+
+    public List<ProductEntity> getProductsSortedByCreatedAt() {
+        return productRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    public List<ProductEntity> getProductsSortedByUpdatedAt() {
+        return productRepository.findAllByOrderByUpdatedAtDesc();
+    }
+
+
+    public List<ProductEntity> getProductsByPriceRangeAndSort(int minPrice, int maxPrice) {
+        List<ProductEntity> products = productRepository.findByPriceBetween(minPrice, maxPrice);
+        return products.stream()
+                .sorted(Comparator.comparing(ProductEntity::getCreatedAt)
+                        .thenComparing(ProductEntity::getUpdatedAt)
+                        .reversed())
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductEntity> getProductsByPriceRange(int minPrice, int maxPrice) {
+        return productRepository.findByPriceBetween(minPrice, maxPrice);
+    }
+
+    public List<ProductEntity> getProductsByPriceRangeAndSortCustom(int minPrice, int maxPrice) {
+        return productRepository.findByPriceBetween(minPrice, maxPrice);
     }
 }
