@@ -6,11 +6,16 @@ import com.carrotzmarket.api.common.exception.ApiException;
 import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
 import com.carrotzmarket.api.domain.user.controller.model.UserSessionInfo;
 import com.carrotzmarket.api.domain.user.controller.model.UserUpdateRequest;
+import com.carrotzmarket.api.domain.user.repository.UserRepository;
 import com.carrotzmarket.api.domain.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/private-api/user")
@@ -18,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserPrivateApiController {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
     // 사용자 정보 조회 (인증 필요)
     @GetMapping("/me")
@@ -57,5 +63,21 @@ public class UserPrivateApiController {
         return Api.OK(response);
     }
 
+
+    // 스웨거에 이미지 올리기 위한 설정
+    @Operation(
+            summary = "Upload profile image",
+            description = "Allows the user to upload a profile image.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
+            )
+    )
+    @PostMapping(value = "/profile/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Api<String> uploadProfileImage(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("loginId") String loginId) {
+        String fileUrl = userService.uploadProfileImage(file, loginId);
+        return Api.OK("프로필 사진 업로드 완료. URL: " + fileUrl);
+    }
 }
 
