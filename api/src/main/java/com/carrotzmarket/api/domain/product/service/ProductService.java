@@ -44,12 +44,11 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
     }
 
+
     public ProductEntity createProduct(ProductCreateRequestDto request) {
-        // 카테고리 조회
         CategoryEntity category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Category not found with ID: " + request.getCategoryId()));
 
-        // 상품 생성
         ProductEntity product = ProductEntity.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -60,7 +59,6 @@ public class ProductService {
                 .status(request.getStatus())
                 .build();
 
-        // 상품 저장
         ProductEntity savedProduct = productRepository.save(product);
 
         if (request.getImages() != null && !request.getImages().isEmpty()) {
@@ -106,6 +104,7 @@ public class ProductService {
         }
         productImageService.saveAll(productImages);
     }
+
 
     public ProductResponseDto getProductById(Long id) {
         ProductEntity product = findProductById(id);
@@ -193,7 +192,6 @@ public class ProductService {
 
 
 
-
     public ProductResponseDto updateProduct(Long id, ProductUpdateRequestDto request) {
         ProductEntity product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + id));
@@ -243,46 +241,55 @@ public class ProductService {
     }
 
 
-
     public List<ProductEntity> getProductByUserId(Long userId) {
         return productRepository.findByUserId(userId);
     }
+
 
     public List<ProductEntity> searchProductByTitle(String title) {
         return productRepository.findByTitleContaining(title);
     }
 
+
     public List<ProductEntity> getProductByStatus(ProductStatus status) {
         return productRepository.findByStatus(status);
     }
+
 
     public List<ProductEntity> getProductByRegion(Long regionId) {
         return productRepository.findByRegionId(regionId);
     }
 
+
     public List<ProductEntity> getTop10Products() {
         return productRepository.findTop10ByOrderByCreatedAtDesc();
     }
+
 
     public List<ProductEntity> getProductByUserIdAndStatus(Long userId, ProductStatus status) {
         return productRepository.findByUserIdAndStatus(userId, status);
     }
 
+
     public List<ProductEntity> getProductsByCategory(Long categoryId) {
         return productRepository.findByCategoryId(categoryId);
     }
+
 
     public List<ProductEntity> getProductsByCategoryName(String categoryName) {
         return productRepository.findByCategoryNameContaining(categoryName);
     }
 
+
     public List<ProductEntity> getProductsSortedByCreatedAtAndUpdatedAt() {
         return productRepository.findAllByOrderByCreatedAtDescUpdatedAtDesc();
     }
 
+
     public List<ProductEntity> getProductsSortedByCreatedAt() {
         return productRepository.findAllByOrderByCreatedAtDesc();
     }
+
 
     public List<ProductEntity> getProductsSortedByUpdatedAt() {
         return productRepository.findAllByOrderByUpdatedAtDesc();
@@ -298,9 +305,11 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+
     public List<ProductEntity> getProductsByPriceRange(int minPrice, int maxPrice) {
         return productRepository.findByPriceBetween(minPrice, maxPrice);
     }
+
 
     public List<ProductEntity> getProductsByPriceRangeAndSortCustom(int minPrice, int maxPrice) {
         return productRepository.findByPriceBetween(minPrice, maxPrice);
