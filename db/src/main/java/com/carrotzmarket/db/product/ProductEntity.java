@@ -2,38 +2,21 @@ package com.carrotzmarket.db.product;
 
 import com.carrotzmarket.db.category.CategoryEntity;
 import com.carrotzmarket.db.transaction.ProductTransactionEntity;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 import java.time.LocalDateTime;
-import java.util.List;
-import lombok.Setter;
 
 @Entity
 @Table(name = "product")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
-@Setter
+@Data
 public class ProductEntity {
 
     @Id

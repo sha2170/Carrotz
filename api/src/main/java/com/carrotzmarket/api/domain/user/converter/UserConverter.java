@@ -8,10 +8,11 @@ import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
 import com.carrotzmarket.db.region.RegionEntity;
 import com.carrotzmarket.db.user.UserEntity;
 import com.carrotzmarket.db.user.UserRegionEntity;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Component
@@ -19,6 +20,9 @@ import java.util.ArrayList;
 public class UserConverter {
 
     private final RegionService regionService;
+
+    @Value("/path/to/uploads")
+    private String uploadDir;
 
     // DTO -> Entity 변환
     public UserEntity toEntity(UserRegisterRequest request) {
@@ -30,13 +34,16 @@ public class UserConverter {
             throw new ApiException(RegionErrorCode.INVALID_REGION, "유효하지 않은 지역.");
         }
 
+
+        String profileImageUrl = "/uploads/profile-images/default-profile.jpg";
+
         UserEntity userEntity = UserEntity.builder()
-                .loginid(request.getLoginId())
+                .loginId(request.getLoginId())
                 .password(request.getPassword())
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .birthday(request.getBirthday() != null ? (request.getBirthday()) : null)
-                .profileImageUrl(request.getProfileImageUrl())
+                .profileImageUrl(profileImageUrl)
                 .region(region.getName())
                 .lastLoginAt(LocalDateTime.now())
                 .createdAt(LocalDateTime.now())
@@ -64,7 +71,7 @@ public class UserConverter {
                 : null;
 
         return UserResponse.builder()
-                .loginId(userEntity.getLoginid())
+                .loginId(userEntity.getLoginId())
                 .email(userEntity.getEmail())
                 .phone(userEntity.getPhone())
                 .birthday(userEntity.getBirthday())
