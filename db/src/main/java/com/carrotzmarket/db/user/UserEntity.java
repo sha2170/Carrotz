@@ -22,30 +22,30 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 기본키 아이디
+    private Long id;
 
     @Column(length = 100, name = "login_id", nullable = false, unique = true)
-    private String loginid; // 로그인 아이디, 중복 방지
+    private String loginId;
 
     @Column(length = 100, nullable = false)
-    private String password; // 비밀번호
+    private String password;
 
     @Column(length = 100, nullable = false, unique = true)
-    private String email; // 이메일, 중복 방지
+    private String email;
 
     @Column(length = 100)
-    private String phone; // 연락처
+    private String phone;
 
-    private LocalDate birthday; // 생일
+    private LocalDate birthday;
 
     @Column(name = "profile_image_url", length = 255)
     private String profileImageUrl;
 
     @Column(name = "is_deleted")
-    private boolean isDeleted; // 삭제 여부 / 1, 0 으로 구분하여 확인
+    private boolean isDeleted;
 
-    private LocalDateTime createdAt; // 생성 날짜
-    private LocalDateTime lastLoginAt; // 최근 로그인 날짜
+    private LocalDateTime createdAt;
+    private LocalDateTime lastLoginAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserRegionEntity> userRegions = new ArrayList<>();

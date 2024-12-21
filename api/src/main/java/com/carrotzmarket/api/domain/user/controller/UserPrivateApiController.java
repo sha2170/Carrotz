@@ -8,10 +8,10 @@ import com.carrotzmarket.api.domain.user.controller.model.UserSessionInfo;
 import com.carrotzmarket.api.domain.user.controller.model.UserUpdateRequest;
 import com.carrotzmarket.api.domain.user.repository.UserRepository;
 import com.carrotzmarket.api.domain.user.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +23,9 @@ public class UserPrivateApiController {
 
     private final UserService userService;
     private final UserRepository userRepository;
+
+    @Value("/path/to/uplaods")
+    private String UPLOAD_DIRECTORY;
 
     // 사용자 정보 조회 (인증 필요)
     @GetMapping("/me")
@@ -59,20 +62,11 @@ public class UserPrivateApiController {
 
 
 
-
-    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/update/{loginId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Api<UserResponse> updateUser(
-            @RequestParam String loginId,
-            @RequestPart(required = false) MultipartFile profileImage,
-            @RequestPart("request") UserUpdateRequest request) throws JsonProcessingException {
-
-        System.out.println("loginId: " + loginId);
-        System.out.println("profileImage: " + (profileImage != null ? profileImage.getOriginalFilename() : "없음"));
-        System.out.println("UserUpdateRequest: " + request);
-
-        if (request == null) {
-            throw new ApiException(UserErrorCode.FILE_NOT_UPLOADED, "User update data is missing.");
-        }
+            @PathVariable String loginId,
+            @RequestPart(value = "file", required = false) MultipartFile profileImage,
+            @RequestPart("request") UserUpdateRequest request) {
 
         UserResponse response = userService.updateUser(loginId, request, profileImage);
         return Api.OK(response);

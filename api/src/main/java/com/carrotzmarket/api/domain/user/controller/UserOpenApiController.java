@@ -5,7 +5,6 @@ import com.carrotzmarket.api.domain.user.controller.model.UserLoginRequest;
 import com.carrotzmarket.api.domain.user.controller.model.UserRegisterRequest;
 import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
 import com.carrotzmarket.api.domain.user.controller.model.UserSessionInfo;
-import com.carrotzmarket.api.domain.user.repository.UserRepository;
 import com.carrotzmarket.api.domain.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

@@ -23,6 +23,17 @@ public class ProductResponseDto {
     private ProductStatus status;
     private List<String> imageUrls;
 
+    public ProductResponseDto(Long id, String title, String description, int price, Long userId, Long regionId, CategoryDto category, ProductStatus status) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.price = price;
+        this.userId = userId;
+        this.regionId = regionId;
+        this.category = category;
+        this.status = status;
+    }
+
     public ProductResponseDto(ProductEntity product) {
         this.id = product.getId();
         this.title = product.getTitle();
@@ -43,8 +54,7 @@ public class ProductResponseDto {
     }
 
     public ProductResponseDto(ProductEntity product, List<String> imageUrls) {
-        this(product);
+        this(product); // 기존 생성자 호출
         this.imageUrls = imageUrls;
     }
 }
-

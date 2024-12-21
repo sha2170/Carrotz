@@ -20,5 +20,5 @@ public class UserUpdateRequest {
 
     private Long regionId;
 
-    private MultipartFile profileImage;
+//    private MultipartFile profileImage;
 }
