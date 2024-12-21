@@ -27,8 +27,5 @@ public class UserRegisterRequest {
 
     private LocalDate birthday;
 
-    private String profileImageUrl;
-
     private Long regionId;
-
 }
