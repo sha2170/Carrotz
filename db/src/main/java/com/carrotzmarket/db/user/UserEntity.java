@@ -25,7 +25,7 @@ public class UserEntity {
     private Long id;
 
     @Column(length = 100, name = "login_id", nullable = false, unique = true)
-    private String loginid;
+    private String loginId;
 
     @Column(length = 100, nullable = false)
     private String password;
