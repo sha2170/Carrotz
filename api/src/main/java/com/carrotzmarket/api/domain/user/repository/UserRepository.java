@@ -1,10 +1,7 @@
 package com.carrotzmarket.api.domain.user.repository;
 
-import com.carrotzmarket.api.common.error.RegionErrorCode;
-import com.carrotzmarket.api.common.exception.ApiException;
 import com.carrotzmarket.db.region.RegionEntity;
 import com.carrotzmarket.db.user.UserEntity;
-import com.carrotzmarket.db.user.UserRegionEntity;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -35,7 +32,7 @@ public class UserRepository{
 
     public Optional<UserEntity> findByLoginId(String loginId) {
         try {
-            UserEntity user = em.createQuery("SELECT u FROM UserEntity u WHERE u.loginid = :loginId", UserEntity.class)
+            UserEntity user = em.createQuery("SELECT u FROM UserEntity u WHERE u.loginId = :loginId", UserEntity.class)
                     .setParameter("loginId", loginId)
                     .getSingleResult();
             return Optional.of(user);
@@ -53,7 +50,7 @@ public class UserRepository{
 
 
     public void deleteByLoginId(String loginId) {
-        UserEntity user = em.createQuery("SELECT u FROM UserEntity u WHERE u.loginid = :loginId", UserEntity.class)
+        UserEntity user = em.createQuery("SELECT u FROM UserEntity u WHERE u.loginId = :loginId", UserEntity.class)
                 .setParameter("loginId", loginId)
                 .getSingleResult();
 
