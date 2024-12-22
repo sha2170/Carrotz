@@ -43,21 +43,18 @@ public class UserService {
     private String profileImageDir;
 
 
-
     public Api<UserResponse> register(UserRegisterRequest request) {
-
         try {
+            userRepository.findByLoginId(request.getLoginId())
+                    .ifPresent(existingUser -> {
+                        throw new ApiException(UserErrorCode.USER_ALREADY_EXIST, "이미 존재하는 로그인 아이디 입니다.");
+                    });
+
             UserEntity userEntity = userConverter.toEntity(request);
-            userEntity.setCreatedAt(LocalDateTime.now());
 
             if (userEntity.getProfileImageUrl() == null || userEntity.getProfileImageUrl().isEmpty()) {
                 userEntity.setProfileImageUrl(defaultProfileImageUrl);
             }
-
-            userRepository.findByLoginId(userEntity.getLoginId())
-                    .ifPresent(existingUser -> {
-                        throw new ApiException(UserErrorCode.USER_ALREADY_EXIST, "이미 존재하는 로그인 아이디 입니다.");
-                    });
 
             RegionEntity region = regionService.findById(request.getRegionId());
             if (region == null) {
