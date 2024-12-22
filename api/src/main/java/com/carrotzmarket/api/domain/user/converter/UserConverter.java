@@ -24,6 +24,9 @@ public class UserConverter {
     @Value("/path/to/uploads")
     private String uploadDir;
 
+    @Value("${default.profile.image:/uploads/profile-images/default-profile.jpg}")
+    private String defaultProfileImageUrl;
+
     // DTO -> Entity 변환
     public UserEntity toEntity(UserRegisterRequest request) {
         if (request.getRegionId() == null) {
@@ -34,15 +37,14 @@ public class UserConverter {
             throw new ApiException(RegionErrorCode.INVALID_REGION, "유효하지 않은 지역.");
         }
 
-
-        String profileImageUrl = "/uploads/profile-images/default-profile.jpg";
+        String profileImageUrl = defaultProfileImageUrl;
 
         UserEntity userEntity = UserEntity.builder()
                 .loginId(request.getLoginId())
                 .password(request.getPassword())
                 .email(request.getEmail())
                 .phone(request.getPhone())
-                .birthday(request.getBirthday() != null ? (request.getBirthday()) : null)
+                .birthday(request.getBirthday())
                 .profileImageUrl(profileImageUrl)
                 .region(region.getName())
                 .lastLoginAt(LocalDateTime.now())
