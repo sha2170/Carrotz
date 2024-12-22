@@ -52,4 +52,14 @@ public class UserEntity {
 
     @Column(length = 100)
     private String region;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.lastLoginAt = LocalDateTime.now();
+    }
 }
