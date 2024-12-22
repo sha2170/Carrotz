@@ -1,8 +1,8 @@
 package com.carrotzmarket.api.domain.user;
 
 import com.carrotzmarket.api.domain.user.controller.UserPrivateApiController;
-import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
-import com.carrotzmarket.api.domain.user.controller.model.UserUpdateRequest;
+import com.carrotzmarket.api.domain.user.dto.UserResponse;
+import com.carrotzmarket.api.domain.user.dto.UserUpdateRequest;
 import com.carrotzmarket.api.domain.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

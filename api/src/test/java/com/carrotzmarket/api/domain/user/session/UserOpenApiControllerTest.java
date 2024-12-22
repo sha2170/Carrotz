@@ -2,9 +2,9 @@ package com.carrotzmarket.api.domain.user.session;
 
 import com.carrotzmarket.api.common.api.Api;
 import com.carrotzmarket.api.domain.user.controller.UserOpenApiController;
-import com.carrotzmarket.api.domain.user.controller.model.UserLoginRequest;
-import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
-import com.carrotzmarket.api.domain.user.controller.model.UserSessionInfo;
+import com.carrotzmarket.api.domain.user.dto.UserLoginRequest;
+import com.carrotzmarket.api.domain.user.dto.UserResponse;
+import com.carrotzmarket.api.domain.user.dto.UserSessionInfo;
 import com.carrotzmarket.api.domain.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
