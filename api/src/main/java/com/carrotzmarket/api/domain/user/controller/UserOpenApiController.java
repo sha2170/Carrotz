@@ -1,16 +1,19 @@
 package com.carrotzmarket.api.domain.user.controller;
 
-import com.carrotzmarket.api.common.api.Api;
-import com.carrotzmarket.api.domain.user.controller.model.UserLoginRequest;
-import com.carrotzmarket.api.domain.user.controller.model.UserRegisterRequest;
-import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
-import com.carrotzmarket.api.domain.user.controller.model.UserSessionInfo;
+import com.carrotzmarket.api.domain.user.dto.UserLoginRequest;
+import com.carrotzmarket.api.domain.user.dto.UserRegisterRequest;
+import com.carrotzmarket.api.domain.user.dto.UserResponse;
+import com.carrotzmarket.api.domain.user.dto.UserSessionInfo;
 import com.carrotzmarket.api.domain.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/open-api/user")
@@ -19,48 +22,48 @@ public class UserOpenApiController {
 
     private final UserService userService;
 
-    @PostMapping("/register")
-    public Api<UserResponse> register(@Valid @RequestBody UserRegisterRequest request) {
-        return userService.register(request);
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> register(
+            @RequestPart UserRegisterRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+
+        UserResponse response = userService.register(request, file);
+        return ResponseEntity.ok().build();
     }
 
+
     @PostMapping("/login")
-    public Api<UserResponse> login(@Valid @RequestBody UserLoginRequest request, HttpServletRequest httpRequest) {
-        Api<UserResponse> response = userService.login(request);
+    public ResponseEntity<UserResponse> login(@Valid @RequestBody UserLoginRequest request, HttpServletRequest httpRequest) {
+        UserResponse response = userService.login(request);
 
         HttpSession session = httpRequest.getSession();
-        UserResponse userResponse = response.getData();
+        session.setAttribute("userSession", new UserSessionInfo(
+                response.getId(),
+                response.getLoginId(),
+                response.getEmail(),
+                response.getPhone(),
+                response.getProfileImageUrl(),
+                response.getRegion()
+        ));
 
-        UserSessionInfo sessionInfo = new UserSessionInfo(
-                userResponse.getId(),
-                userResponse.getLoginId(),
-                userResponse.getEmail(),
-                userResponse.getPhone(),
-                userResponse.getProfileImageUrl(),
-                userResponse.getRegion()
-        );
-        session.setAttribute("userSession", sessionInfo);
-
-        return response;
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
-    public Api<String> logout(HttpServletRequest httpRequest) {
+    public ResponseEntity<String> logout(HttpServletRequest httpRequest) {
         HttpSession session = httpRequest.getSession(false);
         if (session != null) {
             session.invalidate();
         }
-        return Api.OK("성공적으로 로그아웃 하였습니다.");
+        return ResponseEntity.ok("성공적으로 로그아웃 하였습니다.");
     }
 
-    // 세션 상태 확인 API
     @GetMapping("/session-status")
-    public Api<String> checkSessionStatus(HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession(false); // 기존 세션 가져오기
+    public ResponseEntity<String> checkSessionStatus(HttpServletRequest httpRequest) {
+        HttpSession session = httpRequest.getSession(false);
         if (session == null || session.getAttribute("userSession") == null) {
-            return Api.unauthorized("Session expired or not found"); // 세션 없음
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Session expired or not found");
         }
-        return Api.OK("Session is active"); // 세션 유효
+        return ResponseEntity.ok("세션 유지중");
     }
 }
-
