@@ -19,6 +19,4 @@ public class UserUpdateRequest {
     private String phone;
 
     private Long regionId;
-
-//    private MultipartFile profileImage;
 }
