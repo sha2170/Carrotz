@@ -38,7 +38,7 @@ public class UserEntity {
 
     private LocalDate birthday;
 
-    @Column(name = "profile_image_url", length = 255)
+    @Column(name = "profile_image_url", length = 255, nullable = false)
     private String profileImageUrl;
 
     @Column(name = "is_deleted")
