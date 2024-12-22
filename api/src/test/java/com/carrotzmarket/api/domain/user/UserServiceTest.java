@@ -1,11 +1,10 @@
 package com.carrotzmarket.api.domain.user;
 
 import com.carrotzmarket.api.common.api.Api;
-import com.carrotzmarket.api.common.error.ErrorCodeInterface;
 import com.carrotzmarket.api.common.exception.ApiException;
-import com.carrotzmarket.api.domain.user.controller.model.UserLoginRequest;
-import com.carrotzmarket.api.domain.user.controller.model.UserRegisterRequest;
-import com.carrotzmarket.api.domain.user.controller.model.UserResponse;
+import com.carrotzmarket.api.domain.user.dto.UserLoginRequest;
+import com.carrotzmarket.api.domain.user.dto.UserRegisterRequest;
+import com.carrotzmarket.api.domain.user.dto.UserResponse;
 import com.carrotzmarket.api.domain.user.converter.UserConverter;
 import com.carrotzmarket.api.domain.user.repository.UserRepository;
 import com.carrotzmarket.api.domain.user.service.UserService;
