@@ -3,7 +3,6 @@ package com.carrotzmarket.api.domain.region.service;
 import com.carrotzmarket.api.domain.region.repository.RegionRepository;
 import com.carrotzmarket.db.region.RegionEntity;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

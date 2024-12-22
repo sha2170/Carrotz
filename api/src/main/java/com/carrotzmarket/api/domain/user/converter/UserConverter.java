@@ -3,7 +3,6 @@ package com.carrotzmarket.api.domain.user.converter;
 import com.carrotzmarket.api.common.error.RegionErrorCode;
 import com.carrotzmarket.api.common.exception.ApiException;
 import com.carrotzmarket.api.domain.region.repository.RegionRepository;
-import com.carrotzmarket.api.domain.region.service.RegionService;
 import com.carrotzmarket.api.domain.user.dto.UserRegisterRequest;
 import com.carrotzmarket.api.domain.user.dto.UserResponse;
 import com.carrotzmarket.db.region.RegionEntity;
