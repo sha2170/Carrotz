@@ -1,4 +1,4 @@
-package com.carrotzmarket.api.domain.user.controller.model;
+package com.carrotzmarket.api.domain.user.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

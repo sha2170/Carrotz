@@ -1,10 +1,9 @@
-package com.carrotzmarket.api.domain.user.controller.model;
+package com.carrotzmarket.api.domain.user.dto;
 
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
