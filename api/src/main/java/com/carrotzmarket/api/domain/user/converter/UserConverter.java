@@ -2,6 +2,7 @@ package com.carrotzmarket.api.domain.user.converter;
 
 import com.carrotzmarket.api.common.error.RegionErrorCode;
 import com.carrotzmarket.api.common.exception.ApiException;
+import com.carrotzmarket.api.domain.region.repository.RegionRepository;
 import com.carrotzmarket.api.domain.region.service.RegionService;
 import com.carrotzmarket.api.domain.user.dto.UserRegisterRequest;
 import com.carrotzmarket.api.domain.user.dto.UserResponse;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 @RequiredArgsConstructor
 public class UserConverter {
 
-    private final RegionService regionService;
+    private final RegionRepository regionRepository;
 
     @Value("/path/to/uploads")
     private String uploadDir;
@@ -32,7 +33,7 @@ public class UserConverter {
         if (request.getRegionId() == null) {
             throw new ApiException(RegionErrorCode.INVALID_REGION, "지역이 제공되지 않음");
         }
-        RegionEntity region = regionService.findById(request.getRegionId());
+        RegionEntity region = regionRepository.findById(request.getRegionId());
         if (region == null) {
             throw new ApiException(RegionErrorCode.INVALID_REGION, "유효하지 않은 지역.");
         }
