@@ -45,12 +45,18 @@ public class UserService {
                     throw new ApiException(UserErrorCode.USER_ALREADY_EXIST, "이미 존재하는 사용자입니다.");
                 });
 
+        if (request.getRegionId() == null) {
+            throw new ApiException(RegionErrorCode.INVALID_REGION, "지역 ID는 필수 입력 값입니다.");
+        }
+
         RegionEntity region = regionRepository.findById(request.getRegionId())
                 .orElseThrow(() -> new ApiException(RegionErrorCode.INVALID_REGION, "유효하지 않은 지역입니다."));
 
         String profileImageUrl = saveProfileImage(request.getLoginId(), profileImage);
 
         UserEntity userEntity = userConverter.toEntity(request, region, profileImageUrl);
+        userEntity.setRegion(region.getName());
+
         userRepository.save(userEntity);
 
         return userConverter.toResponse(userEntity);

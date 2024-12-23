@@ -32,8 +32,7 @@ public class UserServiceTest {
                 "test@example.com",
                 "010-1234-5678",
                 LocalDate.of(1990, 1, 1),
-                1L,
-                null
+                1L
         );
 
         UserResponseDto response = userService.register(request, null);

@@ -17,12 +17,12 @@ public class RegionService {
         this.regionRepository = regionRepository;
     }
 
-    public void saveRegion(RegionEntity regionEntity) {
-        regionRepository.save(regionEntity);
-    }
-
     public RegionEntity getRegionById(Long id) {
         return regionRepository.findById(id).orElse(null);
+    }
+
+    public void saveRegion(RegionEntity regionEntity) {
+        regionRepository.save(regionEntity);
     }
 
     public void deleteRegion(Long id) {

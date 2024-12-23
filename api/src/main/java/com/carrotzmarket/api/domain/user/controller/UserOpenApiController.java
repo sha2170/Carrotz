@@ -2,6 +2,8 @@ package com.carrotzmarket.api.domain.user.controller;
 
 import com.carrotzmarket.api.domain.user.dto.*;
 import com.carrotzmarket.api.domain.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -18,10 +20,12 @@ public class UserOpenApiController {
 
     private final UserService userService;
 
-
     @PostMapping(value = "/register", consumes = "multipart/form-data")
+    @Operation(summary = "회원 가입", description = "사용자 정보를 등록합니다.")
     public ResponseEntity<UserResponseDto> register(
-            @ModelAttribute @Valid UserRegisterRequestDto request,
+            @Parameter(description = "사용자 정보")
+            @RequestPart("request") UserRegisterRequestDto request,
+            @Parameter(description = "프로필 이미지 파일", required = false)
             @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
         UserResponseDto response = userService.register(request, profileImage);
         return ResponseEntity.ok(response);
