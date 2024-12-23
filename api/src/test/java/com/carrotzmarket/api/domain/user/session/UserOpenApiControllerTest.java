@@ -2,9 +2,9 @@ package com.carrotzmarket.api.domain.user.session;
 
 import com.carrotzmarket.api.common.api.Api;
 import com.carrotzmarket.api.domain.user.controller.UserOpenApiController;
-import com.carrotzmarket.api.domain.user.dto.UserLoginRequest;
-import com.carrotzmarket.api.domain.user.dto.UserResponse;
-import com.carrotzmarket.api.domain.user.dto.UserSessionInfo;
+import com.carrotzmarket.api.domain.user.dto.UserLoginRequestDto;
+import com.carrotzmarket.api.domain.user.dto.UserResponseDto;
+import com.carrotzmarket.api.domain.user.dto.UserSessionInfoDto;
 import com.carrotzmarket.api.domain.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,8 +45,8 @@ public class UserOpenApiControllerTest {
     @Test
     void login_create_session() throws Exception {
         // GIVEN: Mock 데이터 준비
-        UserLoginRequest request = new UserLoginRequest("test", "password");
-        UserResponse response = new UserResponse();
+        UserLoginRequestDto request = new UserLoginRequestDto("test", "password");
+        UserResponseDto response = new UserResponseDto();
         response.setLoginId("test");
         response.setEmail("test@gmail.com");
 
@@ -59,15 +59,15 @@ public class UserOpenApiControllerTest {
                         .content(new ObjectMapper().writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(request().sessionAttribute("userSession",
-                        new UserSessionInfo(null, "test", "test@gmail.com","010-1111-1111", "asdasdasd", "aaaa" ))) // 세션 검증
+                        new UserSessionInfoDto(null, "test", "test@gmail.com","010-1111-1111", "asdasdasd", "aaaa" ))) // 세션 검증
                 .andExpect(jsonPath("$.data.loginId").value("test"));
     }
 
     @Test
     void session_expiresAfterTimeout() throws Exception {
         // GIVEN: Mock 데이터 준비
-        UserLoginRequest request = new UserLoginRequest("testUser", "testPassword");
-        UserResponse response = new UserResponse();
+        UserLoginRequestDto request = new UserLoginRequestDto("testUser", "testPassword");
+        UserResponseDto response = new UserResponseDto();
         response.setLoginId("testUser");
         response.setEmail("testUser@gmail.com");
 
