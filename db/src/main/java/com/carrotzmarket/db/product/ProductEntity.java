@@ -50,10 +50,10 @@ public class ProductEntity {
     private LocalDateTime updatedAt;
 
     @Column(name = "view_count", nullable = false)
-    private int viewCount;
+    private int viewCount = 0;
 
     @Column(name = "favorite_count", nullable = false)
-    private int favoriteCount;
+    private int favoriteCount = 0;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

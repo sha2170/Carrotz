@@ -128,7 +128,8 @@ public class ProductService {
                         product.getCategory().isEnabled()
                 ) : null,
                 product.getStatus(),
-                imageUrls
+                imageUrls,
+                product.getFavoriteCount()
         );
     }
 
@@ -148,6 +149,9 @@ public class ProductService {
                 .build();
         favoriteProductRepository.save(favorite);
 
+        product.setFavoriteCount(product.getFavoriteCount() + 1);
+        productRepository.save(product);
+
         return "관심 상품으로 등록되었습니다.";
     }
 
@@ -161,6 +165,12 @@ public class ProductService {
         }
 
         favoriteProductRepository.delete(existingFavorite.get());
+
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+        product.setFavoriteCount(Math.max(product.getFavoriteCount() - 1, 0)); // 최소값 0 유지
+        productRepository.save(product);
+
         return "관심 상품이 정상적으로 해제되었습니다.";
     }
 
@@ -220,7 +230,8 @@ public class ProductService {
                 product.getRegionId(),
                 categoryDto,
                 product.getStatus(),
-                imageUrls
+                imageUrls,
+                product.getFavoriteCount()
         );
     }
 
