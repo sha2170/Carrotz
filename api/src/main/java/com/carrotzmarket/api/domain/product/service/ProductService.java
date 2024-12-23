@@ -13,6 +13,7 @@ import com.carrotzmarket.api.domain.region.service.RegionService;
 import com.carrotzmarket.api.domain.user.dto.ProductSummaryDto;
 import com.carrotzmarket.api.domain.user.dto.SellerProfileDto;
 import com.carrotzmarket.api.domain.user.repository.UserRepository;
+import com.carrotzmarket.api.domain.viewedProduct.service.ViewedProductService;
 import com.carrotzmarket.db.category.CategoryEntity;
 import com.carrotzmarket.db.favoriteProduct.FavoriteProductEntity;
 import com.carrotzmarket.db.product.ProductEntity;
@@ -40,6 +41,7 @@ public class ProductService {
     private final FileUploadService fileUploadService;
     private final FavoriteProductRepository favoriteProductRepository;
     private final UserRepository userRepository;
+    private final ViewedProductService viewedProductService;
 
     public ProductEntity findProductById(Long id) {
         return productRepository.findById(id)
@@ -297,6 +299,25 @@ public class ProductService {
         return result;
     }
 
+    public ProductResponseDto getProductById(Long id, Long userId) {
+        viewedProductService.recordViewedProduct(userId, id);
+
+        ProductEntity product = findProductById(id);
+
+        List<ProductImageEntity> productImages = productImageService.getProductImageByProductId(id);
+        List<String> imageUrls = productImages.stream()
+                .map(ProductImageEntity::getImageUrl)
+                .collect(Collectors.toList());
+
+        boolean isViewed = viewedProductService.getViewedProductIds(userId).contains(id);
+
+        return new ProductResponseDto(
+                product,
+                imageUrls,
+                isViewed
+        );
+    }
+
     public List<ProductEntity> getProductByUserId(Long userId) {
         return productRepository.findByUserId(userId);
     }
@@ -369,5 +390,22 @@ public class ProductService {
 
     public List<ProductEntity> getProductsByPriceRangeAndSortCustom(int minPrice, int maxPrice) {
         return productRepository.findByPriceBetween(minPrice, maxPrice);
+    }
+
+
+    public List<ProductResponseDto> getSearchResults(Long userId, String title) {
+        List<ProductEntity> products = productRepository.findByTitleContaining(title);
+
+        Set<Long> viewedProductIds = viewedProductService.getViewedProductIds(userId);
+
+        return products.stream()
+                .map(product -> new ProductResponseDto(
+                        product,
+                        productImageService.getProductImageByProductId(product.getId()).stream()
+                                .map(ProductImageEntity::getImageUrl)
+                                .collect(Collectors.toList()),
+                        viewedProductIds.contains(product.getId())
+                ))
+                .collect(Collectors.toList());
     }
 }
