@@ -51,14 +51,12 @@ public class UserService {
         if (profileImage == null || profileImage.isEmpty()) {
             userEntity.setProfileImageUrl(defaultProfileImageUrl);
         } else {
-            String profileImageUrl = saveProfileImage(request.getLoginId(), profileImage);
-            userEntity.setProfileImageUrl(profileImageUrl);
+            userEntity.setProfileImageUrl(saveProfileImage(request.getLoginId(), profileImage));
         }
 
-        RegionEntity region = regionRepository.findById(request.getRegionId());
-        if (region == null) {
-            throw new ApiException(RegionErrorCode.INVALID_REGION, "유효하지 않은 지역.");
-        }
+        RegionEntity region = regionRepository.findById(request.getRegionId())
+                .orElseThrow(() -> new ApiException(RegionErrorCode.INVALID_REGION, "유효하지 않은 지역입니다."));
+        userEntity.setRegion(region.getName());
 
         userRepository.save(userEntity);
         return userConverter.toResponse(userEntity);

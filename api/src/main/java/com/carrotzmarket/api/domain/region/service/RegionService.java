@@ -22,7 +22,7 @@ public class RegionService {
     }
 
     public RegionEntity getRegionById(Long id) {
-        return regionRepository.findById(id);
+        return regionRepository.findById(id).orElse(null);
     }
 
     public void deleteRegion(Long id) {

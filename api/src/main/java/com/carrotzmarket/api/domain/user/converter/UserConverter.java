@@ -32,10 +32,9 @@ public class UserConverter {
         if (request.getRegionId() == null) {
             throw new ApiException(RegionErrorCode.INVALID_REGION, "지역이 제공되지 않음");
         }
-        RegionEntity region = regionRepository.findById(request.getRegionId());
-        if (region == null) {
-            throw new ApiException(RegionErrorCode.INVALID_REGION, "유효하지 않은 지역.");
-        }
+        RegionEntity region = regionRepository.findById(request.getRegionId())
+                .orElseThrow(() -> new ApiException(RegionErrorCode.INVALID_REGION, "유효하지 않은 지역."));
+
 
         String profileImageUrl = defaultProfileImageUrl;
 

@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,12 +21,12 @@ public class UserOpenApiController {
 
     private final UserService userService;
 
-    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> register(
-            @RequestPart UserRegisterRequest request,
-            @RequestPart(value = "file", required = false) MultipartFile file) {
+    @PostMapping(value = "/register", consumes = "multipart/form-data")
+    public ResponseEntity<UserResponse> register(
+            @RequestPart @Valid UserRegisterRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile profileImage) {
 
-        UserResponse response = userService.register(request, file);
+        UserResponse response = userService.register(request, profileImage);
         return ResponseEntity.ok().build();
     }
 

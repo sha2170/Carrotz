@@ -6,6 +6,7 @@ import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class RegionRepository {
@@ -18,14 +19,13 @@ public class RegionRepository {
     }
 
     public void deleteById(Long id) {
-        RegionEntity entity = findById(id);
-        if (entity != null) {
-            em.remove(entity);
-        }
+        Optional<RegionEntity> optionalEntity = findById(id);
+        optionalEntity.ifPresent(em::remove); // Optional 처리
     }
 
-    public RegionEntity findById(Long id){
-        return em.find(RegionEntity.class, id);
+    public Optional<RegionEntity> findById(Long id) {
+        RegionEntity regionEntity = em.find(RegionEntity.class, id);
+        return Optional.ofNullable(regionEntity);
     }
 
     public List<RegionEntity> findAllRegions(){
