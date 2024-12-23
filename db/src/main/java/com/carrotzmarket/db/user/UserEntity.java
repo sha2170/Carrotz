@@ -38,7 +38,7 @@ public class UserEntity {
 
     private LocalDate birthday;
 
-    @Column(name = "profile_image_url", length = 255)
+    @Column(name = "profile_image_url", length = 255, nullable = false)
     private String profileImageUrl;
 
     @Column(name = "is_deleted")
@@ -52,4 +52,17 @@ public class UserEntity {
 
     @Column(length = 100)
     private String region;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+        if (this.profileImageUrl == null || this.profileImageUrl.isEmpty()) {
+            this.profileImageUrl = "/uploads/profile-images/default-profile.jpg";
+        }
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.lastLoginAt = LocalDateTime.now();
+    }
 }

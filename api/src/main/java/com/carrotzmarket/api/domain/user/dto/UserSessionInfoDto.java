@@ -1,4 +1,4 @@
-package com.carrotzmarket.api.domain.user.controller.model;
+package com.carrotzmarket.api.domain.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSessionInfo {
+public class UserSessionInfoDto {
 
     private Long id;
     private String loginId;
