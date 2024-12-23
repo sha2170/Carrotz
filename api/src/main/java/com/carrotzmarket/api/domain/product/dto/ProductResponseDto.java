@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class ProductResponseDto {
     private Long id;
@@ -24,8 +23,9 @@ public class ProductResponseDto {
     private List<String> imageUrls;
     private int favoriteCount;
     private int viewCount;
+    private boolean isViewed;
 
-
+    // 기본 생성자
     public ProductResponseDto(ProductEntity product) {
         this.id = product.getId();
         this.title = product.getTitle();
@@ -36,6 +36,7 @@ public class ProductResponseDto {
         this.status = product.getStatus();
         this.favoriteCount = product.getFavoriteCount();
         this.viewCount = product.getViewCount();
+        this.isViewed = false; // 기본값
 
         if (product.getCategory() != null) {
             this.category = new CategoryDto(
@@ -48,7 +49,29 @@ public class ProductResponseDto {
     }
 
     public ProductResponseDto(ProductEntity product, List<String> imageUrls) {
-        this(product); // 기존 생성자 호출
+        this(product);
         this.imageUrls = imageUrls;
+    }
+
+    public ProductResponseDto(ProductEntity product, List<String> imageUrls, boolean isViewed) {
+        this(product, imageUrls);
+        this.isViewed = isViewed;
+    }
+
+    public ProductResponseDto(Long id, String title, String description, int price, Long userId, Long regionId,
+                              CategoryDto category, ProductStatus status, List<String> imageUrls,
+                              int favoriteCount, int viewCount) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.price = price;
+        this.userId = userId;
+        this.regionId = regionId;
+        this.category = category;
+        this.status = status;
+        this.imageUrls = imageUrls;
+        this.favoriteCount = favoriteCount;
+        this.viewCount = viewCount;
+        this.isViewed = false;
     }
 }
