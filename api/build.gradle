@@ -51,6 +51,9 @@ dependencies {
     // JSONPath for JSON validation
     testImplementation 'com.jayway.jsonpath:json-path'
 
+    // E-mail Validation
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    testImplementation 'com.icegreen:greenmail:1.6.10'
 
 }
 
