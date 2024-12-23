@@ -1,18 +1,19 @@
 package com.carrotzmarket.api.domain.user.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSessionInfo {
+public class UserLoginRequestDto {
 
-    private Long id;
+    @NotNull
     private String loginId;
-    private String email;
-    private String phone;
-    private String profileImageUrl;
-    private String regionName;
+
+    @NotNull
+    private String password;
 }
