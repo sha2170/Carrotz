@@ -14,6 +14,7 @@ import com.carrotzmarket.api.common.exception.ApiException;
 import com.carrotzmarket.api.domain.product.service.ProductService;
 import com.carrotzmarket.api.domain.transaction.converter.ProductTransactionConverter;
 import com.carrotzmarket.api.domain.transaction.dto.PurchaseRequest;
+import com.carrotzmarket.api.domain.transaction.dto.TransactionHistoryDto;
 import com.carrotzmarket.api.domain.transaction.dto.TransactionStatusUpdateRequest;
 import com.carrotzmarket.api.domain.transaction.repository.ProductTransactionRepository;
 import com.carrotzmarket.db.product.ProductEntity;
@@ -65,13 +66,34 @@ public class ProductTransactionService {
         return transaction;
     }
 
-    public List<ProductTransactionEntity> findAllPurchaseHistory(Long userId) {
-        return repository.findAllPurchaseHistoryByUserId(userId);
+    private TransactionHistoryDto convertToTransactionHistoryDto(ProductTransactionEntity transaction) {
+        TransactionHistoryDto dto = new TransactionHistoryDto();
+        dto.setId(transaction.getId());
+        dto.setTitle(transaction.getProduct().getTitle());
+        dto.setPrice(transaction.getProduct().getPrice());
+        dto.setTransactionDate(transaction.getTransactionDate());
+        dto.setTradingPlace(transaction.getTradingPlace());
+        dto.setBuyerId(transaction.getBuyerId());
+        dto.setSellerId(transaction.getSellerId());
+        dto.setStatus(transaction.getStatus().name());
+        return dto;
     }
 
-    public List<ProductTransactionEntity> findAllSalesHistory(Long userId) {
-        return repository.findAllSalesHistoryByUserId(userId);
+    public List<TransactionHistoryDto> findAllPurchaseHistory(Long userId) {
+        List<ProductTransactionEntity> transactions = repository.findAllPurchaseHistoryByUserId(userId);
+        return transactions.stream()
+                .map(this::convertToTransactionHistoryDto)
+                .toList();
     }
+
+
+    public List<TransactionHistoryDto> findAllSalesHistory(Long userId) {
+        List<ProductTransactionEntity> transactions = repository.findAllSalesHistoryByUserId(userId);
+        return transactions.stream()
+                .map(this::convertToTransactionHistoryDto)
+                .toList();
+    }
+
 
     private void changeTransactionStatus(ProductTransactionEntity entity, ProductEntity product, TransactionStatus status) {
         if (entity.getStatus().equals(status)) {
