@@ -18,7 +18,7 @@ public class RegionInitializer implements CommandLineRunner {
     @Transactional
     @Override
     public void run(String... args) throws Exception {
-        if (regionRepository.findAllRegions().isEmpty()) { // 수정된 방식
+        if (regionRepository.findAllRegions().isEmpty()) {
             RegionEntity seoul = RegionEntity.builder().name("서울시").build();
 
             RegionEntity gangbuk = RegionEntity.builder().name("강북구").parentRegion(seoul).build();

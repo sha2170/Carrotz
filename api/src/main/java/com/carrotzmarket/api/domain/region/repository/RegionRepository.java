@@ -15,17 +15,20 @@ public class RegionRepository {
     private EntityManager em;
 
     public void save(RegionEntity regionEntity) {
-        em.persist(regionEntity);
+        if (regionEntity.getId() == null) {
+            em.persist(regionEntity); // 새 엔티티인 경우
+        } else {
+            em.merge(regionEntity); // 이미 존재하는 엔티티인 경우
+        }
     }
 
     public void deleteById(Long id) {
         Optional<RegionEntity> optionalEntity = findById(id);
-        optionalEntity.ifPresent(em::remove); // Optional 처리
+        optionalEntity.ifPresent(em::remove);
     }
 
     public Optional<RegionEntity> findById(Long id) {
-        RegionEntity regionEntity = em.find(RegionEntity.class, id);
-        return Optional.ofNullable(regionEntity);
+        return Optional.ofNullable(em.find(RegionEntity.class, id));
     }
 
     public List<RegionEntity> findAllRegions(){
