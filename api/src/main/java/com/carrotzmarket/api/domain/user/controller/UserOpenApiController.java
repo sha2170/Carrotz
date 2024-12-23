@@ -1,8 +1,10 @@
 package com.carrotzmarket.api.domain.user.controller;
 
-import com.carrotzmarket.api.domain.user.dto.*;
+import com.carrotzmarket.api.domain.user.dto.UserLoginRequestDto;
+import com.carrotzmarket.api.domain.user.dto.UserRegisterRequestDto;
+import com.carrotzmarket.api.domain.user.dto.UserResponseDto;
+import com.carrotzmarket.api.domain.user.dto.UserSessionInfoDto;
 import com.carrotzmarket.api.domain.user.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -21,7 +23,6 @@ public class UserOpenApiController {
     private final UserService userService;
 
     @PostMapping(value = "/register", consumes = "multipart/form-data")
-    @Operation(summary = "회원 가입", description = "사용자 정보를 등록합니다.")
     public ResponseEntity<UserResponseDto> register(
             @Parameter(description = "사용자 정보")
             @RequestPart("request") UserRegisterRequestDto request,
