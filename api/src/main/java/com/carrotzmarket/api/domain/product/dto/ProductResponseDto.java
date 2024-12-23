@@ -23,6 +23,7 @@ public class ProductResponseDto {
     private ProductStatus status;
     private List<String> imageUrls;
     private int favoriteCount;
+    private int viewCount;
 
 
     public ProductResponseDto(ProductEntity product) {
@@ -34,6 +35,7 @@ public class ProductResponseDto {
         this.regionId = product.getRegionId();
         this.status = product.getStatus();
         this.favoriteCount = product.getFavoriteCount();
+        this.viewCount = product.getViewCount();
 
         if (product.getCategory() != null) {
             this.category = new CategoryDto(

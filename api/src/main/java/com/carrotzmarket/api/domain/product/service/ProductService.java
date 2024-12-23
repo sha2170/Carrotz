@@ -107,6 +107,8 @@ public class ProductService {
 
 
     public ProductResponseDto getProductById(Long id) {
+        incrementViewCount(id);
+
         ProductEntity product = findProductById(id);
 
         List<ProductImageEntity> productImages = productImageService.getProductImageByProductId(id);
@@ -129,7 +131,8 @@ public class ProductService {
                 ) : null,
                 product.getStatus(),
                 imageUrls,
-                product.getFavoriteCount()
+                product.getFavoriteCount(),
+                product.getViewCount()
         );
     }
 
@@ -231,7 +234,8 @@ public class ProductService {
                 categoryDto,
                 product.getStatus(),
                 imageUrls,
-                product.getFavoriteCount()
+                product.getFavoriteCount(),
+                product.getViewCount()
         );
     }
 
@@ -249,6 +253,15 @@ public class ProductService {
                 .collect(Collectors.toList());
 
         return new ProductResponseDto(product, imageUrls);
+    }
+
+    @Transactional
+    public void incrementViewCount(Long productId) {
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+
+        product.setViewCount(product.getViewCount() + 1);
+        productRepository.save(product);
     }
 
 
