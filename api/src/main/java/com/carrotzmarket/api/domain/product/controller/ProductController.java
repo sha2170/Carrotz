@@ -39,6 +39,11 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{id}/seller-info")
+    public ResponseEntity<Map<String, Object>> getSellerInfoAndOtherProducts(@PathVariable Long id) {
+        Map<String, Object> result = productService.getSellerInfoAndOtherProducts(id);
+        return ResponseEntity.ok(result);
+    }
 
     @PatchMapping("/{id}")
     public ResponseEntity<ProductResponseDto> updateProduct(
