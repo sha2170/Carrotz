@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,7 +43,7 @@ public class UserPrivateApiController {
         return ResponseEntity.ok("성공적으로 로그아웃 하였습니다.");
     }
 
-    @GetMapping("/session-info")
+    @GetMapping("/session-info/{loginId}")
     public ResponseEntity<UserSessionInfoDto> getSessionInfo(HttpServletRequest httpRequest) {
         HttpSession session = httpRequest.getSession(false);
 
@@ -60,12 +61,13 @@ public class UserPrivateApiController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/users/update")
+    @PutMapping(value = "/users/update/{loginId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<UserResponseDto> updateUser(
-            @RequestParam String loginId,
+            @PathVariable String loginId,
             @ModelAttribute UserUpdateRequestDto request,
-            @RequestParam(required = false) MultipartFile profileImage) {
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
         UserResponseDto updatedUser = userService.updateUser(loginId, request, profileImage);
         return ResponseEntity.ok(updatedUser);
     }
+
 }
