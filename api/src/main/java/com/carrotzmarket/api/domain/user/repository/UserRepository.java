@@ -19,26 +19,12 @@ public class UserRepository{
         em.persist(user);
     }
 
-    public Optional<UserEntity> findById(Long id) {
-        UserEntity user = em.find(UserEntity.class, id);
-        return Optional.ofNullable(user); // Optional로 감싸 반환
-    }
-
-
-    public List<UserEntity> findAll() {
-        return em.createQuery("SELECT u FROM UserEntity u", UserEntity.class).getResultList();
-    }
-
 
     public Optional<UserEntity> findByLoginId(String loginId) {
-        try {
-            UserEntity user = em.createQuery("SELECT u FROM UserEntity u WHERE u.loginId = :loginId", UserEntity.class)
-                    .setParameter("loginId", loginId)
-                    .getSingleResult();
-            return Optional.of(user);
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+        return em.createQuery("SELECT u FROM UserEntity u WHERE u.loginId = :loginId", UserEntity.class)
+                .setParameter("loginId", loginId)
+                .getResultStream()
+                .findFirst();
     }
 
 
@@ -62,6 +48,10 @@ public class UserRepository{
     public Optional<RegionEntity> findRegionById(Long regionid){
         RegionEntity region = em.find(RegionEntity.class, regionid);
         return Optional.ofNullable(region);
+    }
+
+    public Optional<UserEntity> findById(Long id) {
+        return Optional.ofNullable(em.find(UserEntity.class, id));
     }
 }
 

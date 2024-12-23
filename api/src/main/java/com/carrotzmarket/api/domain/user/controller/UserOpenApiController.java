@@ -1,9 +1,6 @@
 package com.carrotzmarket.api.domain.user.controller;
 
-import com.carrotzmarket.api.domain.user.dto.UserLoginRequest;
-import com.carrotzmarket.api.domain.user.dto.UserRegisterRequest;
-import com.carrotzmarket.api.domain.user.dto.UserResponse;
-import com.carrotzmarket.api.domain.user.dto.UserSessionInfo;
+import com.carrotzmarket.api.domain.user.dto.*;
 import com.carrotzmarket.api.domain.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -21,22 +18,24 @@ public class UserOpenApiController {
 
     private final UserService userService;
 
-    @PostMapping(value = "/register", consumes = "multipart/form-data")
-    public ResponseEntity<UserResponse> register(
-            @RequestPart @Valid UserRegisterRequest request,
-            @RequestPart(value = "file", required = false) MultipartFile profileImage) {
 
-        UserResponse response = userService.register(request, profileImage);
-        return ResponseEntity.ok().build();
+    @PostMapping(value = "/register", consumes = "multipart/form-data")
+    public ResponseEntity<UserResponseDto> register(
+            @ModelAttribute @Valid UserRegisterRequestDto request,
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+        UserResponseDto response = userService.register(request, profileImage);
+        return ResponseEntity.ok(response);
     }
 
 
+
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@Valid @RequestBody UserLoginRequest request, HttpServletRequest httpRequest) {
-        UserResponse response = userService.login(request);
+    public ResponseEntity<UserResponseDto> login(
+            @Valid @RequestBody UserLoginRequestDto request, HttpServletRequest httpRequest) {
+        UserResponseDto response = userService.login(request);
 
         HttpSession session = httpRequest.getSession();
-        session.setAttribute("userSession", new UserSessionInfo(
+        session.setAttribute("userSession", new UserSessionInfoDto(
                 response.getId(),
                 response.getLoginId(),
                 response.getEmail(),
@@ -46,15 +45,6 @@ public class UserOpenApiController {
         ));
 
         return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest httpRequest) {
-        HttpSession session = httpRequest.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-        return ResponseEntity.ok("성공적으로 로그아웃 하였습니다.");
     }
 
     @GetMapping("/session-status")

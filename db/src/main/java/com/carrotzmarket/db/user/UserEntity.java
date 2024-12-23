@@ -56,6 +56,9 @@ public class UserEntity {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+        if (this.profileImageUrl == null || this.profileImageUrl.isEmpty()) {
+            this.profileImageUrl = "/uploads/profile-images/default-profile.jpg";
+        }
     }
 
     @PreUpdate
