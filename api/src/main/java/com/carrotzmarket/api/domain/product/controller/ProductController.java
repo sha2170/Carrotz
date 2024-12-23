@@ -39,6 +39,11 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{id}/seller-info")
+    public ResponseEntity<Map<String, Object>> getSellerInfoAndOtherProducts(@PathVariable Long id) {
+        Map<String, Object> result = productService.getSellerInfoAndOtherProducts(id);
+        return ResponseEntity.ok(result);
+    }
 
     @PatchMapping("/{id}")
     public ResponseEntity<ProductResponseDto> updateProduct(
@@ -80,20 +85,11 @@ public class ProductController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ProductResponseDto>> getProductByUserId(@PathVariable Long userId) {
         List<ProductEntity> products = productService.getProductByUserId(userId);
+
         List<ProductResponseDto> response = products.stream()
-                .map(product -> new ProductResponseDto(
-                        product.getId(),
-                        product.getTitle(),
-                        product.getDescription(),
-                        product.getPrice(),
-                        product.getUserId(),
-                        product.getRegionId(),
-                        product.getCategory() != null ?
-                                new CategoryDto(product.getCategory().getId(), product.getCategory().getName(), product.getCategory().getDescription(), product.getCategory().isEnabled())
-                                : null,
-                        product.getStatus()
-                ))
+                .map(ProductResponseDto::new)
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(response);
     }
 
@@ -155,18 +151,11 @@ public class ProductController {
     @GetMapping("/category-name")
     public ResponseEntity<List<ProductResponseDto>> getProductsByCategoryName(@RequestParam String categoryName) {
         List<ProductEntity> products = productService.getProductsByCategoryName(categoryName);
+
         List<ProductResponseDto> response = products.stream()
-                .map(product -> new ProductResponseDto(
-                        product.getId(),
-                        product.getTitle(),
-                        product.getDescription(),
-                        product.getPrice(),
-                        product.getUserId(),
-                        product.getRegionId(),
-                        new CategoryDto(product.getCategory().getId(), product.getCategory().getName(), product.getCategory().getDescription(), product.getCategory().isEnabled()),
-                        product.getStatus()
-                ))
+                .map(ProductResponseDto::new)
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(response);
     }
 

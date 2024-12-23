@@ -22,17 +22,9 @@ public class ProductResponseDto {
     private CategoryDto category;
     private ProductStatus status;
     private List<String> imageUrls;
+    private int favoriteCount;
+    private int viewCount;
 
-    public ProductResponseDto(Long id, String title, String description, int price, Long userId, Long regionId, CategoryDto category, ProductStatus status) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.price = price;
-        this.userId = userId;
-        this.regionId = regionId;
-        this.category = category;
-        this.status = status;
-    }
 
     public ProductResponseDto(ProductEntity product) {
         this.id = product.getId();
@@ -42,6 +34,8 @@ public class ProductResponseDto {
         this.userId = product.getUserId();
         this.regionId = product.getRegionId();
         this.status = product.getStatus();
+        this.favoriteCount = product.getFavoriteCount();
+        this.viewCount = product.getViewCount();
 
         if (product.getCategory() != null) {
             this.category = new CategoryDto(

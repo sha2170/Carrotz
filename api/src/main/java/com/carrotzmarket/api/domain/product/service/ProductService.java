@@ -10,21 +10,22 @@ import com.carrotzmarket.api.domain.product.repository.ProductRepository;
 import com.carrotzmarket.api.domain.productImage.service.FileUploadService;
 import com.carrotzmarket.api.domain.productImage.service.ProductImageService;
 import com.carrotzmarket.api.domain.region.service.RegionService;
+import com.carrotzmarket.api.domain.user.dto.ProductSummaryDto;
+import com.carrotzmarket.api.domain.user.dto.SellerProfileDto;
+import com.carrotzmarket.api.domain.user.repository.UserRepository;
 import com.carrotzmarket.db.category.CategoryEntity;
 import com.carrotzmarket.db.favoriteProduct.FavoriteProductEntity;
 import com.carrotzmarket.db.product.ProductEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 import com.carrotzmarket.db.productImage.ProductImageEntity;
+import com.carrotzmarket.db.user.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +39,7 @@ public class ProductService {
     private final ProductImageService productImageService;
     private final FileUploadService fileUploadService;
     private final FavoriteProductRepository favoriteProductRepository;
+    private final UserRepository userRepository;
 
     public ProductEntity findProductById(Long id) {
         return productRepository.findById(id)
@@ -107,6 +109,8 @@ public class ProductService {
 
 
     public ProductResponseDto getProductById(Long id) {
+        incrementViewCount(id);
+
         ProductEntity product = findProductById(id);
 
         List<ProductImageEntity> productImages = productImageService.getProductImageByProductId(id);
@@ -128,7 +132,9 @@ public class ProductService {
                         product.getCategory().isEnabled()
                 ) : null,
                 product.getStatus(),
-                imageUrls
+                imageUrls,
+                product.getFavoriteCount(),
+                product.getViewCount()
         );
     }
 
@@ -148,6 +154,9 @@ public class ProductService {
                 .build();
         favoriteProductRepository.save(favorite);
 
+        product.setFavoriteCount(product.getFavoriteCount() + 1);
+        productRepository.save(product);
+
         return "관심 상품으로 등록되었습니다.";
     }
 
@@ -161,6 +170,12 @@ public class ProductService {
         }
 
         favoriteProductRepository.delete(existingFavorite.get());
+
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+        product.setFavoriteCount(Math.max(product.getFavoriteCount() - 1, 0)); // 최소값 0 유지
+        productRepository.save(product);
+
         return "관심 상품이 정상적으로 해제되었습니다.";
     }
 
@@ -220,7 +235,9 @@ public class ProductService {
                 product.getRegionId(),
                 categoryDto,
                 product.getStatus(),
-                imageUrls
+                imageUrls,
+                product.getFavoriteCount(),
+                product.getViewCount()
         );
     }
 
@@ -240,6 +257,45 @@ public class ProductService {
         return new ProductResponseDto(product, imageUrls);
     }
 
+    @Transactional
+    public void incrementViewCount(Long productId) {
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+
+        product.setViewCount(product.getViewCount() + 1);
+        productRepository.save(product);
+    }
+
+    @Transactional
+    public Map<String, Object> getSellerInfoAndOtherProducts(Long productId) {
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+
+        Long sellerId = product.getUserId();
+        UserEntity seller = userRepository.findById(sellerId)
+                .orElseThrow(() -> new IllegalArgumentException("판매자를 찾을 수 없습니다."));
+
+        SellerProfileDto sellerProfile = new SellerProfileDto(
+                seller.getId(),
+                seller.getLoginId(),
+                seller.getProfileImageUrl()
+        );
+
+        List<ProductEntity> otherProducts = productRepository.findByUserId(sellerId)
+                .stream()
+                .filter(p -> !p.getId().equals(productId))
+                .collect(Collectors.toList());
+
+        List<ProductSummaryDto> otherProductDtos = otherProducts.stream()
+                .map(p -> new ProductSummaryDto(p.getId(), p.getTitle(), p.getPrice()))
+                .collect(Collectors.toList());
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("sellerProfile", sellerProfile);
+        result.put("otherProducts", otherProductDtos);
+
+        return result;
+    }
 
     public List<ProductEntity> getProductByUserId(Long userId) {
         return productRepository.findByUserId(userId);
