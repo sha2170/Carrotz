@@ -22,11 +22,11 @@ public class RegionEntity {
     private Long id;
 
     @Column(length = 100, nullable = false, unique = true)
-    private String name; // 지역 이름
+    private String name;
 
     // 자기 자신을 참조하는 부모-자식 관계 설정
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id") // 상위 지역을 참조
+    @JoinColumn(name = "parent_id")
     private RegionEntity parentRegion;
 
     @OneToMany(mappedBy = "parentRegion", cascade = CascadeType.ALL, orphanRemoval = true)
