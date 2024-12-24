@@ -66,6 +66,12 @@ public class ProductTransactionService {
         return transaction;
     }
 
+    @Transactional(readOnly = true)
+    public TransactionHistoryDto findTransactionDetailById(Long id) {
+        ProductTransactionEntity transaction = repository.findTransactionDetailById(id)
+                .orElseThrow(() -> new ApiException(TRANSACTION_NOT_FOUND, "Transaction not found with id: " + id));
+        return convertToTransactionHistoryDto(transaction);
+    }
 
     private TransactionHistoryDto convertToTransactionHistoryDto(ProductTransactionEntity transaction) {
         TransactionHistoryDto dto = new TransactionHistoryDto();

@@ -42,6 +42,12 @@ public class ProductTransactionController {
         return service.findAllSalesHistory(userId);
     }
 
+    @GetMapping("/transaction/detail/{id}")
+    public TransactionHistoryDto getTransactionDetail(@PathVariable Long id) {
+        return service.findTransactionDetailById(id);
+    }
+
+
     @PutMapping("/transaction")
     public ProductTransactionEntity updateTransaction(@RequestBody TransactionStatusUpdateRequest request) {
         return service.updateTransaction(request);

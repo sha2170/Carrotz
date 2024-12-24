@@ -40,4 +40,15 @@ public class ProductTransactionRepository {
                 .setParameter("id", id)
                 .getResultList();
     }
+
+    public Optional<ProductTransactionEntity> findTransactionDetailById(Long id) {
+        return em.createQuery(
+                        "SELECT t FROM ProductTransactionEntity t " +
+                                "JOIN FETCH t.product p " +
+                                "WHERE t.id = :id", ProductTransactionEntity.class)
+                .setParameter("id", id)
+                .getResultStream().findFirst();
+    }
+
+
 }

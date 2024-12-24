@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @Getter
@@ -19,6 +20,7 @@ public class TransactionHistoryDto {
     private String title;
     private int price;
     private LocalDate transactionDate;
+    private LocalDateTime tradingHours;
     private String tradingPlace;
     private String status;
 }
