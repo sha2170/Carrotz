@@ -4,7 +4,9 @@ import com.carrotzmarket.api.domain.category.dto.CategoryDto;
 import com.carrotzmarket.api.domain.product.dto.ProductCreateRequestDto;
 import com.carrotzmarket.api.domain.product.dto.ProductResponseDto;
 import com.carrotzmarket.api.domain.product.dto.ProductUpdateRequestDto;
+import com.carrotzmarket.api.domain.product.repository.ProductRepository;
 import com.carrotzmarket.api.domain.product.service.ProductService;
+import com.carrotzmarket.api.domain.user.service.UserService;
 import com.carrotzmarket.db.product.ProductEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +27,8 @@ import java.util.stream.Collectors;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductRepository productRepository;
+    private final UserService userService;
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<String> createProduct(@ModelAttribute @Valid ProductCreateRequestDto productCreateRequestDto) {
@@ -45,6 +49,12 @@ public class ProductController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/{id}/manner-temperature")
+    public ResponseEntity<Map<String, Object>> getSellerMannerTemperatureAndOtherProducts(@PathVariable Long id) {
+        Map<String, Object> response = productService.getSellerMannerTemperature(id);
+        return ResponseEntity.ok(response);
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<ProductResponseDto> updateProduct(
             @PathVariable Long id,
@@ -60,6 +70,17 @@ public class ProductController {
             @RequestParam ProductStatus status) {
         ProductResponseDto updatedProduct = productService.updateProductStatus(id, status);
         return ResponseEntity.ok(updatedProduct);
+    }
+
+    @PatchMapping("/{productId}/update-manner-temperature")
+    public ResponseEntity<String> updateMannerTemperature(@PathVariable Long productId) {
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+        Long sellerId = product.getUserId();
+
+        userService.updateMannerTemperature(sellerId);
+
+        return ResponseEntity.ok("판매자의 매너 온도가 업데이트 되었습니다.");
     }
 
 

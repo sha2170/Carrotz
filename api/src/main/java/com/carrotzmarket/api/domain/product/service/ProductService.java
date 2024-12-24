@@ -10,15 +10,19 @@ import com.carrotzmarket.api.domain.product.repository.ProductRepository;
 import com.carrotzmarket.api.domain.productImage.service.FileUploadService;
 import com.carrotzmarket.api.domain.productImage.service.ProductImageService;
 import com.carrotzmarket.api.domain.region.service.RegionService;
+import com.carrotzmarket.api.domain.transaction.repository.ProductTransactionRepository;
 import com.carrotzmarket.api.domain.user.dto.ProductSummaryDto;
 import com.carrotzmarket.api.domain.user.dto.SellerProfileDto;
 import com.carrotzmarket.api.domain.user.repository.UserRepository;
+import com.carrotzmarket.api.domain.user.service.UserService;
 import com.carrotzmarket.api.domain.viewedProduct.service.ViewedProductService;
 import com.carrotzmarket.db.category.CategoryEntity;
 import com.carrotzmarket.db.favoriteProduct.FavoriteProductEntity;
 import com.carrotzmarket.db.product.ProductEntity;
 import com.carrotzmarket.db.product.ProductStatus;
 import com.carrotzmarket.db.productImage.ProductImageEntity;
+import com.carrotzmarket.db.transaction.ProductTransactionEntity;
+import com.carrotzmarket.db.transaction.TransactionStatus;
 import com.carrotzmarket.db.user.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,6 +46,8 @@ public class ProductService {
     private final FavoriteProductRepository favoriteProductRepository;
     private final UserRepository userRepository;
     private final ViewedProductService viewedProductService;
+    private final ProductTransactionRepository productTransactionRepository;
+    private final UserService userService;
 
     public ProductEntity findProductById(Long id) {
         return productRepository.findById(id)
@@ -259,6 +265,21 @@ public class ProductService {
         return new ProductResponseDto(product, imageUrls);
     }
 
+    public Map<String, Object> getSellerMannerTemperature(Long productId) {
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품을 찾을 수 없습니다."));
+
+        Long sellerId = product.getUserId();
+        Double mannerTemperature = userRepository.findMannerTemperatureById(sellerId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 판매자를 찾을 수 없습니다."));
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("sellerId", sellerId);
+        response.put("mannerTemperature", mannerTemperature);
+
+        return response;
+    }
+
     @Transactional
     public void incrementViewCount(Long productId) {
         ProductEntity product = productRepository.findById(productId)
@@ -297,6 +318,34 @@ public class ProductService {
         result.put("otherProducts", otherProductDtos);
 
         return result;
+    }
+
+    @Transactional
+    public void updateTransactionStatus(Long transactionId, String status) {
+        ProductTransactionEntity transaction = productTransactionRepository.findTransactionDetailById(transactionId)
+                .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+
+        if ("COMPLETED".equals(status) && !"COMPLETED".equals(transaction.getStatus())) {
+            transaction.setStatus(TransactionStatus.COMPLETED);
+            productTransactionRepository.save(transaction);
+
+            UserEntity seller = userRepository.findById(transaction.getSellerId())
+                    .orElseThrow(() -> new IllegalArgumentException("Seller not found"));
+            seller.setMannerTemperature(seller.getMannerTemperature() + 1);
+            userRepository.save(seller);
+        }
+    }
+
+    @Transactional
+    public void completeTransaction(Long transactionId) {
+        // 거래 상태 업데이트
+        ProductTransactionEntity transaction = productTransactionRepository.findTransactionDetailById(transactionId)
+                .orElseThrow(() -> new IllegalArgumentException("거래를 찾을 수 없습니다."));
+        transaction.setStatus(TransactionStatus.COMPLETED);
+        productTransactionRepository.save(transaction);
+
+        // 판매자의 매너 온도 업데이트
+        userService.updateMannerTemperature(transaction.getSellerId());
     }
 
     public ProductResponseDto getProductById(Long id, Long userId) {

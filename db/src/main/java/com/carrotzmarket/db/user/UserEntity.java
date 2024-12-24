@@ -53,6 +53,9 @@ public class UserEntity {
     @Column(length = 100)
     private String region;
 
+    @Column(name = "manner_temperature", nullable = false)
+    private double mannerTemperature = 36.5;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();

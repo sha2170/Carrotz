@@ -53,5 +53,29 @@ public class UserRepository{
     public Optional<UserEntity> findById(Long id) {
         return Optional.ofNullable(em.find(UserEntity.class, id));
     }
+
+    public Optional<Double> findMannerTemperatureById(Long userId) {
+        return em.createQuery("SELECT u.mannerTemperature FROM UserEntity u WHERE u.id = :userId", Double.class)
+                .setParameter("userId", userId)
+                .getResultStream()
+                .findFirst();
+    }
+
+    public int countCompletedTransactionsBySellerId(Long sellerId) {
+        return em.createQuery("SELECT COUNT(t) FROM ProductTransactionEntity t WHERE t.sellerId = :sellerId AND t.status = 'COMPLETED'", Long.class)
+                .setParameter("sellerId", sellerId)
+                .getSingleResult()
+                .intValue();
+    }
+
+    public void updateMannerTemperature(Long userId, double mannerTemperature) {
+        em.createQuery("UPDATE UserEntity u SET u.mannerTemperature = :mannerTemperature WHERE u.id = :userId")
+                .setParameter("mannerTemperature", mannerTemperature)
+                .setParameter("userId", userId)
+                .executeUpdate();
+    }
+
 }
+
+
 

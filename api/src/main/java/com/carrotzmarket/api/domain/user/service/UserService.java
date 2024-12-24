@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -176,5 +177,18 @@ public class UserService {
         System.out.println("User updated: " + userEntity);
 
         return userConverter.toResponse(userEntity);
+    }
+
+
+    @Transactional
+    public void updateMannerTemperature(Long sellerId) {
+        int completedTransactions = userRepository.countCompletedTransactionsBySellerId(sellerId);
+
+        Optional<UserEntity> sellerOptional = userRepository.findById(sellerId);
+        UserEntity seller = sellerOptional.orElseThrow(() -> new IllegalArgumentException("판매자를 찾을 수 없습니다."));
+
+        double newMannerTemperature = 36.5 + completedTransactions;
+
+        userRepository.updateMannerTemperature(sellerId, newMannerTemperature);
     }
 }
